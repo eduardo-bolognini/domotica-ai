@@ -1,0 +1,29 @@
+{
+    "camera": [
+        {
+            "nome": "letto",
+            "descrizione": "Spotlights positioned above the beds in the bedroom.",
+            "tipo": "spotlights",
+            "entity_id": ["letto_centro", "letto_dx", "letto_sx"]
+        },
+        {
+            "nome": "scrivania",
+            "descrizione": "Spotlights located above the area of ​​the two desks.",
+            "tipo": "spotlights",
+            "entity_id": ["scrivania_centro", "scrivania_dx", "scrivania_sx"]
+        },
+        {
+            "nome": "lampada",
+            "descrizione": "A light located at the center of the room in the bedroom, rarely used.",
+            "tipo": "light",
+            "entity_id": "lampada"
+        },
+        {
+            "nome": "music",
+            "descrizione": "A music device that operates throughout the bedroom and is used when at the desk but the user always wants to be asked for confirmation first.",
+            "tipo": "music",
+            "entity_id": ""
+        },
+        {"nome": "monitor", "descrizione": "A smartplug located in the bedroom, used to turn on the monitor and led strip at the desk only when the user is working there. The light of the led stip doesn't make enough light by itself to work, you will also have to turn on 'scrivania'", "tipo": "smartplug", "entity_id": "monitor"}
+    ]
+}
