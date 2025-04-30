@@ -1031,8 +1031,8 @@ def RUN():
     thread = threading.Thread(target=run_server, args=(port,))
     thread.start()
 
-    # thread_aut = threading.Thread(target=passive_automation, args=())
-    # thread_aut.start()
+    thread_aut = threading.Thread(target=passive_automation, args=())
+    thread_aut.start()
     
     global casa, openai
     
