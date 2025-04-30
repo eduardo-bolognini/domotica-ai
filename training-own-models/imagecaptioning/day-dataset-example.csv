@@ -1,0 +1,91 @@
+
+image_path,caption_openai
+# caption_openai is not a real caption created from their template but simply a "leftover" from an old version
+# Dataset nuovo - con luce
+dataset_/0.jpg,User inspecting closet
+dataset_/3.jpg,User inspecting closet
+dataset_/4.jpg,User inspecting closet
+dataset_/5.jpg,User inspecting closet
+dataset_/6.jpg,User inspecting drawers
+dataset_/7.jpg,User inspecting drawers
+dataset_/8.jpg,User inspecting drawers
+dataset_/9.jpg,User in bed awake
+dataset_/12.jpg,User in bed awake
+dataset_/17.jpg,User in bed awake
+dataset_/18.jpg,User in bed awake
+dataset_/31.jpg,User in bed awake
+dataset_/22.jpg,User in bed awake using phone
+dataset_/32.jpg,User in bed awake using phone
+dataset_/33.jpg,User in bed awake using phone
+dataset_/23.jpg,User in bed awake using computer
+dataset_/24.jpg,User in bed awake using computer
+dataset_/34.jpg,User in bed awake using computer
+dataset_/27.jpg,User in bed awake using tablet
+dataset_/35.jpg,User in bed awake using tablet
+dataset_/36.jpg,User in bed awake using tablet
+dataset_/37.jpg,User sitting on bed awake
+dataset_/38.jpg,User sitting on bed awake
+dataset_/39.jpg,User sitting on bed awake
+dataset_/51.jpg,User at desk using computer
+dataset_/49.jpg,User at desk using computer
+dataset_/30.jpg,User at desk using computer
+dataset_/41.jpg,User at desk using monitor and computer
+dataset_/42.jpg,User at desk using monitor and computer
+dataset_/43.jpg,User at desk using monitor and computer
+dataset_/44.jpg,User at desks
+dataset_/45.jpg,User at desks
+dataset_/53.jpg,User at desks
+dataset_/54.jpg,User at desk working on paper
+dataset_/55.jpg,User at desk working on paper
+dataset_/50.jpg,User at desk working on paper
+dataset_/52.jpg,User at desk working on paper
+dataset_/56.jpg,No user near beds
+dataset_/57.jpg,No user near beds
+dataset_/58.jpg,No user near desks
+dataset_/59.jpg,No user near desks
+dataset_/79.jpg,No user near desks
+dataset_/80.jpg,No user near beds
+dataset_/81.jpg,No user near beds
+dataset_/82.jpg,No user near desks
+dataset_/60.jpg,User looking out the window
+dataset_/61.jpg,User looking out the window
+dataset_/62.jpg,User looking out the window
+dataset_/63.jpg,User looking out the window
+dataset_/64.jpg,User looking out the french window
+dataset_/65.jpg,User looking out the french window
+dataset_/66.jpg,User looking out the french window
+dataset_/67.jpg,User at shelves
+dataset_/68.jpg,User at shelves
+dataset_/69.jpg,User at shelves
+dataset_/70.jpg,User asleep in bed  
+dataset_/71.jpg,User asleep in bed  
+dataset_/72.jpg,User asleep in bed  
+dataset_/73.jpg,User asleep in bed  
+dataset_/74.jpg,User asleep in bed  
+dataset_/75.jpg,User asleep in bed  
+# Dataset Vecchio
+dataset vecchio/77.jpg,No user near beds
+dataset vecchio/89.jpg,No user near desks
+dataset vecchio/76.jpg,No user near beds
+dataset vecchio/48.jpg,User at desk using monitor and computer
+dataset vecchio/49.jpg,User at desk using monitor and computer
+dataset vecchio/44.jpg,User at desks
+dataset vecchio/51.jpg,User at desk using monitor and computer
+dataset vecchio/52.jpg,User at desk using monitor and computer
+dataset vecchio/53.jpg,User at desks
+dataset vecchio/45.jpg,User at desks
+dataset vecchio/46.jpg,User at desk working on paper
+dataset vecchio/71.jpg,User inspecting drawers
+dataset vecchio/8.jpg,User sitting on bed awake
+dataset vecchio/73.jpg,User inspecting closet
+dataset vecchio/9.jpg,User in bed awake using phone
+dataset vecchio/14.jpg,User in bed awake
+dataset vecchio/29.jpg,User asleep in bed
+dataset vecchio/15.jpg,User in bed awake using phone
+dataset vecchio/12.jpg,User in bed awake
+dataset vecchio/21.jpg,User in bed awake using tablet
+dataset vecchio/26.jpg,User in bed awake using tablet
+dataset vecchio/42.jpg,User in bed awake using tablet
+dataset vecchio/16.jpg,User in bed awake using phone
+dataset vecchio/35.jpg,User asleep in bed
+dataset vecchio/28.jpg,User in bed awake using computer
