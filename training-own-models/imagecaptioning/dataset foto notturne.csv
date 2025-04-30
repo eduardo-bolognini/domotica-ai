@@ -1,0 +1,43 @@
+image_path,caption_openai
+dataset_/100.jpg,User at desks
+dataset_/101.jpg,User at desks
+dataset_/103.jpg,User at desks
+dataset_/104.jpg,User at desks
+dataset_/105.jpg,User at desks
+dataset_/106.jpg,User at desks
+dataset_/108.jpg,User at desks
+dataset_/109.jpg,User at desks
+dataset_/110.jpg,User at desks
+dataset_/114.jpg,User at bed awake
+dataset_/115.jpg,User at bed awake
+dataset_/116.jpg,User at bed awake
+dataset_/117.jpg,User at bed awake
+dataset_/118.jpg,User at bed awake
+dataset_/119.jpg,User at bed awake
+dataset_/120.jpg,User at bed awake
+dataset_/139.jpg,User at bed awake
+dataset_/140.jpg,User at bed awake
+dataset_/141.jpg,User at bed awake
+dataset_/121.jpg,No user
+dataset_/122.jpg,No user
+dataset_/112.jpg,No user
+dataset_/113.jpg,No user
+dataset_/142.jpg,No user
+dataset_/143.jpg,No user
+dataset_/144.jpg,No user
+dataset_/145.jpg,No user
+dataset_/146.jpg,No user
+dataset_/147.jpg,No user
+dataset_/123.jpg,User inspecting closet
+dataset_/126.jpg,User inspecting closet
+dataset_/125.jpg,User inspecting closet
+dataset_/131.jpg,User asleep in bed  
+dataset_/132.jpg,User asleep in bed  
+dataset_/134.jpg,User asleep in bed  
+dataset_/127.jpg,User asleep in bed  
+dataset_/128.jpg,User asleep in bed  
+dataset_/129.jpg,User asleep in bed  
+dataset_/130.jpg,User asleep in bed  
+dataset_/135.jpg,User asleep in bed  
+dataset_/136.jpg,User asleep in bed  
+dataset_/137.jpg,User asleep in bed  
