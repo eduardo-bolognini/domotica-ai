@@ -21,11 +21,11 @@ const DEFAULT_CONFIG = {
   actionParams: {
     turn_on: [
       ["camera"],
-      ["bed", "desk", "lamp", "monitor"]
+      ["letto", "scrivania", "lampada", "monitor"]
     ],
     turn_off: [
       ["camera"],
-      ["bed", "desk", "lamp", "monitor"]
+      ["letto", "scrivania", "lampada", "monitor"]
     ],
     turn_off_all: [
       ["camera"]
@@ -176,7 +176,7 @@ function loadCSVData() {
         resolve();
       })
       .on('error', (error) => {
-        console.error(`❌ Error while reading CSV:`, error);
+        console.error(`❌ Error reading CSV:`, error);
         reject(error);
       });
   });
@@ -192,7 +192,7 @@ function loadMovementLog() {
     const data = fs.readFileSync(PATHS.movementLog, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    console.error('Errore nel caricamento log movimenti:', error);
+    console.error('Error loading movement log:', error);
     return [];
   }
 }
@@ -207,7 +207,7 @@ function saveMovementLog(movements) {
     fs.writeFileSync(PATHS.movementLog, JSON.stringify(log, null, 2), 'utf8');
     return true;
   } catch (error) {
-    console.error('Errore nel salvare log movimenti:', error);
+    console.error('Error saving movement log:', error);
     return false;
   }
 }
@@ -240,7 +240,7 @@ function moveMultipleToUndefined(folder, items) {
     
     return { success: true, moved: successCount, total: items.length };
   } catch (error) {
-    console.error('Errore in moveMultipleToUndefined:', error);
+    console.error('Error in moveMultipleToUndefined:', error);
     return { success: false, error: error.message };
   }
 }
@@ -285,7 +285,7 @@ function getClusterPreviews() {
         });
       }
     } catch (error) {
-      console.error(`Error getting preview for ${cluster}:`, error);
+      console.error(`Error previewing ${cluster}:`, error);
     }
   }
   
@@ -309,8 +309,8 @@ app.use('/clusters', (req, res, next) => {
   const staticMiddleware = express.static(PATHS.base);
   staticMiddleware(req, res, (err) => {
     if (err) {
-      console.log(`❌ Error serving file: ${err.message}`);
-      res.status(404).send('Immagine non trovata');
+      console.log(`❌ Error serving: ${err.message}`);
+      res.status(404).send('Image not found');
     } else {
       next();
     }
@@ -323,7 +323,7 @@ app.use('/indefinite', (req, res, next) => {
   staticMiddleware(req, res, (err) => {
     if (err) {
       console.log(`❌ Indefinite error: ${err.message}`);
-      res.status(404).send('File indefinite non trovato');
+      res.status(404).send('Indefinite file not found');
     } else {
       next();
     }
@@ -440,7 +440,7 @@ function loadAnnotations() {
     const data = fs.readFileSync(PATHS.annotations, 'utf8');
     return data.trim() ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Errore nel caricamento annotazioni:', error);
+    console.error('Error loading annotations:', error);
     return [];
   }
 }
@@ -451,7 +451,7 @@ function saveAnnotations(data) {
   try {
     fs.writeFileSync(PATHS.annotations, JSON.stringify(data, null, 2), 'utf8');
   } catch (error) {
-    console.error('Errore nel salvataggio annotazioni:', error);
+    console.error('Error saving annotations:', error);
     throw error;
   }
 }
@@ -459,7 +459,7 @@ function saveAnnotations(data) {
 function getAllClusters() {
   try {
     console.log(`🔍 Searching for clusters in: ${PATHS.base}`);
-    console.log(`📁 Does the folder exist? ${fs.existsSync(PATHS.base)}`);
+    console.log(`📁 Does folder exist? ${fs.existsSync(PATHS.base)}`);
     
     if (!fs.existsSync(PATHS.base)) {
       console.log(`❌ Folder not found: ${PATHS.base}`);
@@ -481,7 +481,7 @@ function getAllClusters() {
     console.log(`✅ Clusters found:`, clusters);
     return clusters;
   } catch (error) {
-    console.error('❌ Errore nel leggere i cluster:', error);
+    console.error('❌ Error reading clusters:', error);
     return [];
   }
 }
@@ -492,7 +492,7 @@ function getAllFolders() {
       .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.') && !dirent.name.includes('node_modules'))
       .map(dirent => dirent.name);
   } catch (error) {
-    console.error('Errore nel leggere le cartelle:', error);
+    console.error('Error reading folders:', error);
     return [];
   }
 }
@@ -504,7 +504,7 @@ function getAllCSVFiles() {
     // Cerca nella cartella corrente
     const currentDirFiles = fs.readdirSync(__dirname)
       .filter(file => file.endsWith('.csv'))
-      .map(file => ({ name: file, path: file, location: 'Cartella corrente' }));
+      .map(file => ({ name: file, path: file, location: 'Current folder' }));
     
     csvFiles.push(...currentDirFiles);
     
@@ -521,7 +521,7 @@ function getAllCSVFiles() {
           .map(file => ({ 
             name: file, 
             path: path.join(subDir, file), 
-            location: `Directory: ${subDir}` 
+            location: `Folder: ${subDir}` 
           }));
         
         csvFiles.push(...subDirFiles);
@@ -558,7 +558,7 @@ function getAllCSVFiles() {
     
     return csvFiles;
   } catch (error) {
-    console.error('Errore nel cercare i file CSV:', error);
+    console.error('Error searching for CSV files:', error);
     return [];
   }
 }
@@ -583,7 +583,7 @@ function moveToUndefined(folder, item) {
     
     return true;
   } catch (error) {
-    console.error(`Error during move:`, error);
+    console.error(`Error moving:`, error);
     return false;
   }
 }
@@ -604,7 +604,7 @@ function moveClusterToUndefined(folder) {
     fs.rmdirSync(srcDir);
     return true;
   } catch (error) {
-    console.error('Errore nello spostamento cluster:', error);
+    console.error('Error moving cluster:', error);
     return false;
   }
 }
@@ -625,12 +625,12 @@ function generateHomeGrid() {
       let previewImage = null;
       
       if (CONFIG.GROUP_MODE) {
-        console.log(`🔄 GROUP mode active`);
+        console.log(`🔄 GROUPS mode active`);
         const groups = fs.readdirSync(clusterPath, { withFileTypes: true })
           .filter(dirent => dirent.isDirectory())
           .map(dirent => dirent.name);
         
-        console.log(`📂 Gruppi trovati in ${folder}:`, groups);
+        console.log(`📂 Groups found in ${folder}:`, groups);
         
         for (const group of groups) {
           const groupPath = path.join(clusterPath, group);
@@ -659,7 +659,7 @@ function generateHomeGrid() {
             <div class="cluster-name">${folder}</div>
           </a>
         `;
-        console.log(`✅ Added item for ${folder}`);
+        console.log(`✅ Aggiunto item per ${folder}`);
       } else {
         console.log(`⚠️ No preview image for ${folder}`);
       }
@@ -715,11 +715,11 @@ function generateGroupContent(folder) {
               <div class="sensor-popup">
                 <h4>Sensor Data</h4>
                 <p><strong>Timestamp:</strong> ${sensors.timestamp}</p>
-                <p><strong>Lamp:</strong> ${sensors['light.lamp'] || 'N/A'}</p>
-                <p><strong>Bed:</strong> ${sensors['light.bed'] || 'N/A'}</p>
-                <p><strong>Desk:</strong> ${sensors['light.desk'] || 'N/A'}</p>
+                <p><strong>Lampada:</strong> ${sensors['light.lampada'] || 'N/A'}</p>
+                <p><strong>Letto:</strong> ${sensors['light.letto'] || 'N/A'}</p>
+                <p><strong>Scrivania:</strong> ${sensors['light.scrivania'] || 'N/A'}</p>
                 <p><strong>Monitor:</strong> ${sensors['switch.monitor'] || 'N/A'}</p>
-                <p><strong>Brightness:</strong> ${sensors['sensor.room_brightness'] || 'N/A'}</p>
+                <p><strong>Luminosità:</strong> ${sensors['sensor.luminosita_camera'] || 'N/A'}</p>
               </div>
             `;
           } else {
@@ -782,11 +782,11 @@ function generateSingleContent(folder) {
             <div class="sensor-popup">
               <h4>Sensor Data</h4>
               <p><strong>Timestamp:</strong> ${sensors.timestamp}</p>
-              <p><strong>Lamp:</strong> ${sensors['light.lamp'] || 'N/A'}</p>
-              <p><strong>Bed:</strong> ${sensors['light.bed'] || 'N/A'}</p>
-              <p><strong>Desk:</strong> ${sensors['light.desk'] || 'N/A'}</p>
+              <p><strong>Lampada:</strong> ${sensors['light.lampada'] || 'N/A'}</p>
+              <p><strong>Letto:</strong> ${sensors['light.letto'] || 'N/A'}</p>
+              <p><strong>Scrivania:</strong> ${sensors['light.scrivania'] || 'N/A'}</p>
               <p><strong>Monitor:</strong> ${sensors['switch.monitor'] || 'N/A'}</p>
-              <p><strong>Brightness:</strong> ${sensors['sensor.room_brightness'] || 'N/A'}</p>
+              <p><strong>Luminosità:</strong> ${sensors['sensor.luminosita_camera'] || 'N/A'}</p>
             </div>
           `;
         } else {
@@ -832,7 +832,7 @@ app.get("/settings", (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>⚙️ Impostazioni - Cluster Manager</title>
+      <title>⚙️ Settings - Cluster Manager</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }
@@ -875,66 +875,66 @@ app.get("/settings", (req, res) => {
     <body>
       <div class="container">
         <div class="header">
-          <a href="/" class="back-link">← Torna alla Home</a>
-          <h1>⚙️ Impostazioni</h1>
+          <a href="/" class="back-link">← Back to Home</a>
+          <h1>⚙️ Settings</h1>
         </div>
         
         <div class="current-config">
-          <h3>📋 Configurazione Attuale</h3>
-          <p><strong>Cartella:</strong> ${CONFIG.BASE_FOLDER}</p>
-          <p><strong>Modalità:</strong> ${CONFIG.GROUP_MODE ? 'Gruppi' : 'Singola'}</p>
-          <p><strong>CSV:</strong> ${CONFIG.CSV_FILE || 'Disabilitato'}</p>
-          <p><strong>Annotazioni:</strong> ${CONFIG.ANNOTATIONS_ENABLED ? 'Abilitate' : 'Disabilitate'}</p>
+          <h3>📋 Current Configuration</h3>
+          <p><strong>Folder:</strong> ${CONFIG.BASE_FOLDER}</p>
+          <p><strong>Mode:</strong> ${CONFIG.GROUP_MODE ? 'Groups' : 'Single'}</p>
+          <p><strong>CSV:</strong> ${CONFIG.CSV_FILE || 'Disabled'}</p>
+          <p><strong>Annotations:</strong> ${CONFIG.ANNOTATIONS_ENABLED ? 'Enabled' : 'Disabled'}</p>
         </div>
         
         <div id="alert-container"></div>
         
         <form class="settings-form" onsubmit="saveSettings(event)">
           <div class="form-group">
-            <label for="base-folder">📁 Cartella Base dei Cluster</label>
+            <label for="base-folder">📁 Cluster Base Folder</label>
             <select id="base-folder" required>
-              <option value="">Seleziona una cartella...</option>
+              <option value="">Select a folder...</option>
               ${folders.map(folder => 
                 `<option value="${folder}" ${folder === CONFIG.BASE_FOLDER ? 'selected' : ''}>${folder}</option>`
               ).join('')}
             </select>
-            <div class="help-text">Seleziona la cartella che contiene i cluster</div>
+            <div class="help-text">Select the folder containing the clusters</div>
           </div>
           
           <div class="form-group">
-            <label for="csv-file">📊 File CSV dei Sensori</label>
+            <label for="csv-file">📊 Sensor CSV File</label>
             <select id="csv-file">
-              <option value="">Nessuno (disabilita sensori)</option>
+              <option value="">None (disable sensors)</option>
               ${csvFiles.map(file => 
                 `<option value="${file.path}" ${file.path === CONFIG.CSV_FILE ? 'selected' : ''}>${file.name} (${file.location})</option>`
               ).join('')}
             </select>
-            <div class="help-text">File CSV contenente i dati dei sensori (opzionale)</div>
+            <div class="help-text">CSV file containing sensor data (optional)</div>
             <div class="help-text" style="margin-top: 8px;">
-              <strong>📁 Percorso personalizzato:</strong> 
-              <input type="text" id="csv-custom-path" placeholder="Inserisci percorso completo del file CSV..." style="width: 100%; margin-top: 5px;">
-              <button type="button" class="btn btn-secondary" onclick="useCustomCSVPath()" style="margin-top: 5px;">Usa Percorso Personalizzato</button>
+              <strong>📁 Custom path:</strong> 
+              <input type="text" id="csv-custom-path" placeholder="Enter full CSV file path..." style="width: 100%; margin-top: 5px;">
+              <button type="button" class="btn btn-secondary" onclick="useCustomCSVPath()" style="margin-top: 5px;">Use Custom Path</button>
             </div>
           </div>
           
           <div class="form-group">
             <div class="checkbox-group">
               <input type="checkbox" id="group-mode" ${CONFIG.GROUP_MODE ? 'checked' : ''}>
-              <label for="group-mode">🔄 Modalità Gruppi</label>
+              <label for="group-mode">🔄 Modalità Groups</label>
             </div>
-            <div class="help-text">Se abilitata, ogni cluster è organizzato in sottocartelle (gruppi di immagini)</div>
+            <div class="help-text">If enabled, each cluster is organized in subfolders (image groups)</div>
           </div>
           
           <div class="form-group">
             <div class="checkbox-group">
               <input type="checkbox" id="annotations-enabled" ${CONFIG.ANNOTATIONS_ENABLED ? 'checked' : ''}>
-              <label for="annotations-enabled">📝 Abilita Annotazioni</label>
+              <label for="annotations-enabled">📝 Enable Annotations</label>
             </div>
-            <div class="help-text">Se abilitata, permette di creare annotazioni avanzate con azioni e descrizioni</div>
+            <div class="help-text">If enabled, allows creating advanced annotations with actions and descriptions</div>
           </div>
           
           <div class="form-group" id="actions-config-group">
-            <label>⚡ Configurazione Azioni (solo se annotazioni abilitate)</label>
+            <label>⚡ Actions Configuration (only if annotations enabled)</label>
             <div class="actions-config">
               <div id="actions-container">
                 ${Object.entries(CONFIG.actionParams).map(([actionName, params]) => `
@@ -943,26 +943,26 @@ app.get("/settings", (req, res) => {
                     <div class="params-container">
                       ${params.map((paramOptions, index) => `
                         <div class="param-group">
-                          <label>Parametro ${index + 1}:</label>
-                          <input type="text" value="${paramOptions.join(', ')}" placeholder="Opzioni separate da virgola">
-                          <button type="button" class="remove-param-btn" onclick="removeParam(this)">Rimuovi</button>
+                          <label>Parameter ${index + 1}:</label>
+                          <input type="text" value="${paramOptions.join(', ')}" placeholder="Comma-separated options">
+                          <button type="button" class="remove-param-btn" onclick="removeParam(this)">Remove</button>
                         </div>
                       `).join('')}
                     </div>
-                    <button type="button" class="add-param-btn" onclick="addParam(this)">+ Aggiungi Parametro</button>
-                    <button type="button" class="remove-param-btn" onclick="removeAction(this)" style="margin-left: 10px;">Rimuovi Azione</button>
+                    <button type="button" class="add-param-btn" onclick="addParam(this)">+ Add Parameter</button>
+                    <button type="button" class="remove-param-btn" onclick="removeAction(this)" style="margin-left: 10px;">Remove Azione</button>
                   </div>
                 `).join('')}
               </div>
-              <button type="button" class="btn btn-secondary" onclick="addAction()">+ Aggiungi Azione</button>
+              <button type="button" class="btn btn-secondary" onclick="addAction()">+ Add Action</button>
             </div>
-            <div class="help-text">Configura le azioni disponibili per le annotazioni</div>
+            <div class="help-text">Configure available actions for annotations</div>
           </div>
           
           <div style="margin-top: 30px;">
-            <button type="submit" class="btn btn-primary">💾 Salva Impostazioni</button>
-            <button type="button" class="btn btn-secondary" onclick="resetToDefault()">🔄 Ripristina Default</button>
-            <button type="button" class="btn btn-danger" onclick="restartServer()">🔄 Riavvia Server</button>
+            <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+            <button type="button" class="btn btn-secondary" onclick="resetToDefault()">🔄 Reset to Default</button>
+            <button type="button" class="btn btn-danger" onclick="restartServer()">🔄 Restart Server</button>
           </div>
         </form>
       </div>
@@ -982,8 +982,8 @@ app.get("/settings", (req, res) => {
           paramDiv.className = 'param-group';
           paramDiv.innerHTML = \`
             <label>Parametro \${paramCount}:</label>
-            <input type="text" placeholder="Opzioni separate da virgola">
-            <button type="button" class="remove-param-btn" onclick="removeParam(this)">Rimuovi</button>
+            <input type="text" placeholder="Comma-separated options">
+            <button type="button" class="remove-param-btn" onclick="removeParam(this)">Remove</button>
           \`;
           paramsContainer.appendChild(paramDiv);
         }
@@ -994,7 +994,7 @@ app.get("/settings", (req, res) => {
         
         function addAction() {
           const container = document.getElementById('actions-container');
-          const actionName = prompt('Nome della nuova azione:');
+          const actionName = prompt('New action name:');
           if (!actionName) return;
           
           const actionDiv = document.createElement('div');
@@ -1003,8 +1003,8 @@ app.get("/settings", (req, res) => {
           actionDiv.innerHTML = \`
             <h4>\${actionName}</h4>
             <div class="params-container"></div>
-            <button type="button" class="add-param-btn" onclick="addParam(this)">+ Aggiungi Parametro</button>
-            <button type="button" class="remove-param-btn" onclick="removeAction(this)" style="margin-left: 10px;">Rimuovi Azione</button>
+            <button type="button" class="add-param-btn" onclick="addParam(this)">+ Add Parameter</button>
+            <button type="button" class="remove-param-btn" onclick="removeAction(this)" style="margin-left: 10px;">Remove Azione</button>
           \`;
           container.appendChild(actionDiv);
         }
@@ -1016,7 +1016,7 @@ app.get("/settings", (req, res) => {
         function useCustomCSVPath() {
           const customPath = document.getElementById('csv-custom-path').value.trim();
           if (!customPath) {
-            alert('Inserisci un percorso valido');
+            alert('Enter a valid path');
             return;
           }
           
@@ -1030,7 +1030,7 @@ app.get("/settings", (req, res) => {
           if (!existingOption) {
             const newOption = document.createElement('option');
             newOption.value = customPath;
-            newOption.text = fileName + ' (Percorso personalizzato)';
+            newOption.text = fileName + ' (Custom path)';
             newOption.selected = true;
             select.appendChild(newOption);
           } else {
@@ -1079,12 +1079,12 @@ app.get("/settings", (req, res) => {
             });
             
             if (response.ok) {
-              showAlert('✅ Impostazioni salvate! Il server verrà riavviato...');
+              showAlert('✅ Settings saved! Server will restart...');
               setTimeout(() => {
                 window.location.href = '/restart';
               }, 2000);
             } else {
-              throw new Error('Errore del server');
+              throw new Error('Server error');
             }
           } catch (err) {
             showAlert('❌ Errore: ' + err.message, 'error');
@@ -1092,7 +1092,7 @@ app.get("/settings", (req, res) => {
         }
         
         async function resetToDefault() {
-          if (!confirm('Ripristinare tutte le impostazioni ai valori di default?')) return;
+          if (!confirm('Reset all settings to default values?')) return;
           
           try {
             const response = await fetch('/reset-settings', {
@@ -1100,10 +1100,10 @@ app.get("/settings", (req, res) => {
             });
             
             if (response.ok) {
-              showAlert('✅ Impostazioni ripristinate!');
+              showAlert('✅ Settings restored!');
               setTimeout(() => location.reload(), 1500);
             } else {
-              throw new Error('Errore del server');
+              throw new Error('Server error');
             }
           } catch (err) {
             showAlert('❌ Errore: ' + err.message, 'error');
@@ -1111,15 +1111,15 @@ app.get("/settings", (req, res) => {
         }
         
         async function restartServer() {
-          if (!confirm('Riavviare il server? Tutte le connessioni verranno interrotte.')) return;
+          if (!confirm('Restart server? All connections will be interrupted.')) return;
           
           try {
             await fetch('/restart', { method: 'POST' });
-            showAlert('🔄 Server in riavvio...');
+            showAlert('🔄 Server restarting...');
             setTimeout(() => window.location.href = '/', 3000);
           } catch (err) {
             // Il server si sta riavviando, quindi l'errore è normale
-            showAlert('🔄 Server in riavvio...');
+            showAlert('🔄 Server restarting...');
             setTimeout(() => window.location.href = '/', 3000);
           }
         }
@@ -1177,34 +1177,34 @@ app.get("/", (req, res) => {
     <body>
       <div class="config-info">
         <div class="config-details">
-          <h3>⚙️ Configurazione Attuale</h3>
-          <p><strong>Cartella:</strong> ${CONFIG.BASE_FOLDER} ${fs.existsSync(PATHS.base) ? '<span class="status-indicator status-active"></span>' : '<span class="status-indicator status-inactive"></span>'}</p>
-          <p><strong>Modalità:</strong> ${CONFIG.GROUP_MODE ? 'Gruppi' : 'Singola'}</p>
-          <p><strong>CSV:</strong> ${CONFIG.CSV_FILE ? CONFIG.CSV_FILE + (csvData.length > 0 ? ` (${csvData.length} righe)` : ' (vuoto)') : 'Disabilitato'} ${CONFIG.CSV_FILE && fs.existsSync(PATHS.csv) ? '<span class="status-indicator status-active"></span>' : '<span class="status-indicator status-inactive"></span>'}</p>
-          <p><strong>Annotazioni:</strong> ${CONFIG.ANNOTATIONS_ENABLED ? 'Abilitate' : 'Disabilitate'}</p>
+          <h3>⚙️ Current Configuration</h3>
+          <p><strong>Folder:</strong> ${CONFIG.BASE_FOLDER} ${fs.existsSync(PATHS.base) ? '<span class="status-indicator status-active"></span>' : '<span class="status-indicator status-inactive"></span>'}</p>
+          <p><strong>Mode:</strong> ${CONFIG.GROUP_MODE ? 'Groups' : 'Single'}</p>
+          <p><strong>CSV:</strong> ${CONFIG.CSV_FILE ? CONFIG.CSV_FILE + (csvData.length > 0 ? ` (${csvData.length} rows)` : ' (empty)') : 'Disabled'} ${CONFIG.CSV_FILE && fs.existsSync(PATHS.csv) ? '<span class="status-indicator status-active"></span>' : '<span class="status-indicator status-inactive"></span>'}</p>
+          <p><strong>Annotations:</strong> ${CONFIG.ANNOTATIONS_ENABLED ? 'Enabled' : 'Disabled'}</p>
         </div>
-        <a href="/settings" class="settings-btn">⚙️ Modifica Impostazioni</a>
+        <a href="/settings" class="settings-btn">⚙️ Edit Settings</a>
       </div>
       
       <h1>🖼️ Cluster Manager</h1>
       
       <div class="nav-buttons">
         <a href="/review">📝 Review Mode</a>
-        <a href="/merge">🔀 Unisci Cluster</a>
-        ${CONFIG.ANNOTATIONS_ENABLED ? '<a href="/annotations">📋 Gestisci Annotazioni</a>' : ''}
-        <a href="/settings">⚙️ Impostazioni</a>
+        <a href="/merge">🔀 Merge Clusters</a>
+        ${CONFIG.ANNOTATIONS_ENABLED ? '<a href="/annotations">📋 Manage Annotations</a>' : ''}
+        <a href="/settings">⚙️ Settings</a>
       </div>
       
       ${!fs.existsSync(PATHS.base) ? `
         <div class="no-clusters">
-          <h2>⚠️ Cartella non trovata</h2>
-          <p>La cartella "${CONFIG.BASE_FOLDER}" non esiste.</p>
-          <p><a href="/settings">Configura le impostazioni</a> per selezionare una cartella valida.</p>
+          <h2>⚠️ Folder not found</h2>
+          <p>The folder "${CONFIG.BASE_FOLDER}" does not exist.</p>
+          <p><a href="/settings">Configure settings</a> to select a valid folder.</p>
         </div>
       ` : getAllClusters().length === 0 ? `
         <div class="no-clusters">
-          <h2>📂 Nessun cluster trovato</h2>
-          <p>La cartella "${CONFIG.BASE_FOLDER}" non contiene cluster (cartelle che iniziano con "cluster_").</p>
+          <h2>📂 No clusters found</h2>
+          <p>The folder "${CONFIG.BASE_FOLDER}" contains no clusters (folders starting with "cluster_").</p>
         </div>
       ` : `
         <div class="grid">
@@ -1225,7 +1225,7 @@ app.post('/save-settings', (req, res) => {
     
     // Validazione base
     if (!newConfig.BASE_FOLDER) {
-      return res.status(400).json({ error: 'Cartella base richiesta' });
+      return res.status(400).json({ error: 'Base folder required' });
     }
     
     // Save configuration
@@ -1236,13 +1236,13 @@ app.post('/save-settings', (req, res) => {
       // Aggiorna paths e ricarica CSV
       updatePaths();
       
-      res.json({ success: true, message: 'Impostazioni salvate' });
+      res.json({ success: true, message: 'Settings saved' });
     } else {
-      res.status(500).json({ error: 'Errore nel salvare le impostazioni' });
+      res.status(500).json({ error: 'Error saving settings' });
     }
   } catch (error) {
-    console.error('Errore nel salvare impostazioni:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error saving settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -1254,22 +1254,22 @@ app.post('/reset-settings', (req, res) => {
     
     if (saved) {
       updatePaths();
-      res.json({ success: true, message: 'Impostazioni ripristinate' });
+      res.json({ success: true, message: 'Settings restored' });
     } else {
-      res.status(500).json({ error: 'Errore nel ripristinare le impostazioni' });
+      res.status(500).json({ error: 'Error restoring settings' });
     }
   } catch (error) {
-    console.error('Errore nel ripristinare impostazioni:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error restoring settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // Route per riavviare il server
 app.post('/restart', (req, res) => {
-  res.json({ success: true, message: 'Server in riavvio...' });
+  res.json({ success: true, message: 'Server restarting...' });
   
   setTimeout(() => {
-    console.log('🔄 Riavvio del server richiesto...');
+    console.log('🔄 Server restart requested...');
     
     // Ricarica configurazione e dati
     CONFIG = loadConfig();
@@ -1277,9 +1277,9 @@ app.post('/restart', (req, res) => {
     
     // Ricarica dati CSV
     loadCSVData().then(() => {
-      console.log('✅ Configurazione e dati ricaricati');
+      console.log('✅ Configuration and data reloaded');
     }).catch(err => {
-      console.error('Errore nel ricaricare i dati CSV:', err);
+      console.error('Error reloading CSV data:', err);
     });
     
   }, 1000);
@@ -1290,7 +1290,7 @@ app.get('/restart', (req, res) => {
     <html>
       <head>
         <meta http-equiv="refresh" content="3;url=/">
-        <title>Riavvio in corso...</title>
+        <title>Restarting...</title>
         <style>
           body { font-family: sans-serif; text-align: center; padding: 40px; background: #f5f5f5; }
           .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -1298,10 +1298,10 @@ app.get('/restart', (req, res) => {
         </style>
       </head>
       <body>
-        <h1>🔄 Riavvio in corso...</h1>
+        <h1>🔄 Restarting...</h1>
         <div class="spinner"></div>
-        <p>Verrai reindirizzato automaticamente alla home page.</p>
-        <p>Se non vieni reindirizzato, <a href="/">clicca qui</a>.</p>
+        <p>You will be automatically redirected to the home page.</p>
+        <p>If you are not redirected, <a href="/">click here</a>.</p>
       </body>
     </html>
   `);
@@ -1317,9 +1317,9 @@ app.get("/cluster/:name", (req, res) => {
     return res.status(404).send(`
       <html>
         <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-          <h1>❌ Cluster non trovato</h1>
-          <p>Il cluster "${folder}" non esiste.</p>
-          <a href="/" style="color: #007bff;">← Torna alla home</a>
+          <h1>❌ Cluster not found</h1>
+          <p>Cluster "${folder}" does not exist.</p>
+          <a href="/" style="color: #007bff;">← Back to home</a>
         </body>
       </html>
     `);
@@ -1512,35 +1512,35 @@ app.get("/cluster/:name", (req, res) => {
     </head>
     <body>
       <div class="header">
-        <a href="/" class="back-link">← Indietro</a>
+        <a href="/" class="back-link">← Back</a>
         <h1>📝 ${folder}</h1>
-        <button class="btn btn-danger" onclick="moveWholeCluster()">🗑️ Sposta Cluster in Undefined</button>
+        <button class="btn btn-danger" onclick="moveWholeCluster()">🗑️ Move Cluster to Undefined</button>
       </div>
       
       ${CONFIG.ANNOTATIONS_ENABLED ? `
       <div class="form-area">
         <div class="form-section">
-          <h3>📝 Descrizioni Avanzate</h3>
+          <h3>📝 Advanced Descriptions</h3>
           <div class="text-field">
-            <label for="simple-description">🔍 Descrizione semplice:</label>
-            <input type="text" id="simple-description" placeholder="Inserisci una descrizione breve del cluster...">
+            <label for="simple-description">🔍 Simple description:</label>
+            <input type="text" id="simple-description" placeholder="Enter a brief description of the cluster...">
           </div>
           <div class="text-field">
-            <label for="output-vocale">🎤 Output vocale:</label>
-            <textarea id="output-vocale" placeholder="Inserisci il testo da convertire in audio..."></textarea>
+            <label for="output-vocale">🎤 Voice output:</label>
+            <textarea id="output-vocale" placeholder="Enter text to convert to audio..."></textarea>
           </div>
         </div>
 
         <div class="form-section">
-          <h3>⚡ Azioni</h3>
+          <h3>⚡ Actions</h3>
           <div id="actions-container"></div>
           <button type="button" class="btn btn-primary" onclick="addAction()">
-            + Aggiungi Azione
+            + Add Action
           </button>
         </div>
         
         <button class="btn btn-success" onclick="saveAnnotations()">
-          💾 Salva Annotazioni
+          💾 Save Annotations
         </button>
         
         <div id="alert-container"></div>
@@ -1554,13 +1554,13 @@ app.get("/cluster/:name", (req, res) => {
       <!-- Selection bar -->
       <div class="selection-bar" id="selection-bar">
         <div class="selection-info">
-          <span id="selection-count">0</span> elementi selezionati
+          <span id="selection-count">0</span> selected items
         </div>
         <div class="selection-actions">
-          <button class="btn btn-primary" onclick="selectAll()">Seleziona Tutto</button>
-          <button class="btn btn-secondary" onclick="deselectAll()">Deseleziona</button>
+          <button class="btn btn-primary" onclick="selectAll()">Select All</button>
+          <button class="btn btn-secondary" onclick="deselectAll()">Deselect</button>
           <button class="btn btn-undefined" onclick="moveSelectedToUndefined()">Move to Undefined</button>
-          <button class="btn btn-success" onclick="showClusterSelectionModal()">Sposta in Cluster</button>
+          <button class="btn btn-success" onclick="showClusterSelectionModal()">Move to Cluster</button>
         </div>
       </div>
 
@@ -1568,18 +1568,18 @@ app.get("/cluster/:name", (req, res) => {
       <div id="cluster-modal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
-            <h2>Seleziona cluster di destinazione</h2>
+            <h2>Select destination cluster</h2>
             <span class="modal-close" onclick="closeModal()">&times;</span>
           </div>
           <div id="cluster-grid" class="cluster-grid">
             <!-- Populated dynamically -->
           </div>
           <div class="new-cluster-input" id="new-cluster-input">
-            <h4>🆕 Crea nuovo cluster</h4>
-            <input type="text" id="new-cluster-name" placeholder="Nome del nuovo cluster (es: cluster_123 o descrizione)" maxlength="50">
+            <h4>🆕 Create new cluster</h4>
+            <input type="text" id="new-cluster-name" placeholder="New cluster name (e.g. cluster_123 or description)" maxlength="50">
             <div class="btn-group">
-              <button class="btn btn-success" onclick="createAndMoveToNewCluster()">✅ Crea e Sposta</button>
-              <button class="btn btn-secondary" onclick="cancelNewCluster()">❌ Annulla</button>
+              <button class="btn btn-success" onclick="createAndMoveToNewCluster()">✅ Create and Move</button>
+              <button class="btn btn-secondary" onclick="cancelNewCluster()">❌ Cancel</button>
             </div>
           </div>
         </div>
@@ -1676,7 +1676,7 @@ app.get("/cluster/:name", (req, res) => {
             });
 
             if (response.ok) {
-              showAlert('✅ Annotazioni salvate con successo!');
+              showAlert('✅ Annotations saved successfully!');
               setTimeout(() => window.location.href = '/review', 800);
             } else throw new Error('Server error');
           } catch (err) {
@@ -1743,11 +1743,11 @@ app.get("/cluster/:name", (req, res) => {
 
         async function moveSelectedToUndefined() {
           if (selectedItems.size === 0) {
-            alert('Nessun elemento selezionato');
+            alert('No items selected');
             return;
           }
           
-          if (!confirm(\`Spostare \${selectedItems.size} elementi in undefined?\`)) return;
+          if (!confirm(\`Spostare \${selectedItems.size} items in undefined?\`)) return;
           
           try {
             const response = await fetch('/move-multiple-to-undefined', {
@@ -1762,7 +1762,7 @@ app.get("/cluster/:name", (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`Spostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`Spostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -1774,7 +1774,7 @@ app.get("/cluster/:name", (req, res) => {
 
         async function showClusterSelectionModal() {
           if (selectedItems.size === 0) {
-            alert('Nessun elemento selezionato');
+            alert('No items selected');
             return;
           }
           
@@ -1793,7 +1793,7 @@ app.get("/cluster/:name", (req, res) => {
               \`).join('') + \`
               <div class="cluster-option new-cluster" onclick="showNewClusterInput()">
                 <div style="height: 100px; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #28a745;">+</div>
-                <div class="cluster-option-name">🆕 Crea Nuovo Cluster</div>
+                <div class="cluster-option-name">🆕 Create New Cluster</div>
               </div>
             \`;
             
@@ -1817,11 +1817,11 @@ app.get("/cluster/:name", (req, res) => {
           const newClusterName = document.getElementById('new-cluster-name').value.trim();
           
           if (!newClusterName) {
-            alert('Inserisci un nome per il nuovo cluster');
+            alert('Enter a name for the new cluster');
             return;
           }
           
-          if (!confirm(\`Creare il nuovo cluster "\${newClusterName}" e spostare \${selectedItems.size} elementi?\`)) return;
+          if (!confirm(\`Creare il nuovo cluster "\${newClusterName}" e spostare \${selectedItems.size} items?\`)) return;
           
           try {
             const response = await fetch('/move-to-new-cluster', {
@@ -1837,7 +1837,7 @@ app.get("/cluster/:name", (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`✅ Nuovo cluster "\${result.targetCluster}" creato!\\nSpostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`✅ Nuovo cluster "\${result.targetCluster}" creato!\\nSpostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -1853,7 +1853,7 @@ app.get("/cluster/:name", (req, res) => {
         }
 
         async function moveSelectedToCluster(targetCluster) {
-          if (!confirm(\`Spostare \${selectedItems.size} elementi in \${targetCluster}?\`)) return;
+          if (!confirm(\`Spostare \${selectedItems.size} items in \${targetCluster}?\`)) return;
           
           try {
             const response = await fetch('/move-to-cluster', {
@@ -1869,7 +1869,7 @@ app.get("/cluster/:name", (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`Spostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`Spostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -1881,7 +1881,7 @@ app.get("/cluster/:name", (req, res) => {
 
         // Other functions
         async function moveToUndefined(folder, item) {
-          const itemType = ${CONFIG.GROUP_MODE} ? 'gruppo' : 'immagine';
+          const itemType = ${CONFIG.GROUP_MODE} ? 'group' : 'image';
           if (!confirm(\`Spostare \${itemType} \${item} in undefined?\`)) return;
           
           try {
@@ -1892,10 +1892,10 @@ app.get("/cluster/:name", (req, res) => {
             });
             
             if (response.ok) {
-              alert(\`\${itemType} spostata!\`);
+              alert(\`\${itemType} moved!\`);
               location.reload();
             } else {
-              throw new Error('Errore del server');
+              throw new Error('Server error');
             }
           } catch (err) {
             alert('❌ Errore: ' + err.message);
@@ -1903,7 +1903,7 @@ app.get("/cluster/:name", (req, res) => {
         }
         
         async function moveWholeCluster() {
-          if (!confirm('Spostare tutto il cluster in undefined?')) return;
+          if (!confirm('Move entire cluster to undefined?')) return;
           
           try {
             const response = await fetch('/move-cluster', {
@@ -1913,10 +1913,10 @@ app.get("/cluster/:name", (req, res) => {
             });
             
             if (response.ok) {
-              alert('Cluster spostato!');
+              alert('Cluster moved!');
               window.location.href = '/';
             } else {
-              throw new Error('Errore del server');
+              throw new Error('Server error');
             }
           } catch (err) {
             alert('❌ Errore: ' + err.message);
@@ -1957,9 +1957,9 @@ app.get('/review', (req, res) => {
     return res.send(`
       <html>
         <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-          <h1>🎉 Tutti i cluster sono stati processati!</h1>
-          <p>Non ci sono più cluster da annotare.</p>
-          <a href="/" style="color: #007bff;">← Torna alla home</a>
+          <h1>🎉 All clusters have been processed!</h1>
+          <p>There are no more clusters to annotate.</p>
+          <a href="/" style="color: #007bff;">← Back to home</a>
         </body>
       </html>
     `);
@@ -2184,34 +2184,34 @@ app.get('/review', (req, res) => {
     <body>
       <div class="header">
         <h1>📝 Review: ${folder}</h1>
-        <div class="counter">📦 ${done} processati su ${total} cluster totali (${remaining} restanti)</div>
+        <div class="counter">📦 ${done} processed out of ${total} total clusters (${remaining} remaining)</div>
       </div>
       
       <div class="controls">
-        <button class="btn btn-primary" onclick="saveAndNext()">💾 Salva e Avanti</button>
-        <button class="btn btn-warning" onclick="skipCluster()">⏭️ Salta Cluster</button>
-        <button class="btn btn-danger" onclick="moveCluster()">🗑️ Sposta cluster in undefined</button>
+        <button class="btn btn-primary" onclick="saveAndNext()">💾 Save and Next</button>
+        <button class="btn btn-warning" onclick="skipCluster()">⏭️ Skip Cluster</button>
+        <button class="btn btn-danger" onclick="moveCluster()">🗑️ Move cluster to undefined</button>
       </div>
       
       ${CONFIG.ANNOTATIONS_ENABLED ? `
       <div class="form-area">
         <div class="form-section">
-          <h3>📝 Descrizioni Avanzate</h3>
+          <h3>📝 Advanced Descriptions</h3>
           <div class="text-field">
-            <label for="simple-description">🔍 Descrizione semplice:</label>
-            <input type="text" id="simple-description" placeholder="Inserisci una descrizione breve del cluster...">
+            <label for="simple-description">🔍 Simple description:</label>
+            <input type="text" id="simple-description" placeholder="Enter a brief description of the cluster...">
           </div>
           <div class="text-field">
-            <label for="output-vocale">🎤 Output vocale:</label>
-            <textarea id="output-vocale" placeholder="Inserisci il testo da convertire in audio..."></textarea>
+            <label for="output-vocale">🎤 Voice output:</label>
+            <textarea id="output-vocale" placeholder="Enter text to convert to audio..."></textarea>
           </div>
         </div>
 
         <div class="form-section">
-          <h3>⚡ Azioni</h3>
+          <h3>⚡ Actions</h3>
           <div id="actions-container"></div>
           <button type="button" class="btn btn-primary" onclick="addAction()">
-            + Aggiungi Azione
+            + Add Action
           </button>
         </div>
         
@@ -2221,8 +2221,8 @@ app.get('/review', (req, res) => {
       <!-- Quick description when annotations are disabled -->
       <div class="controls">
         <div class="quick-description-area">
-          <h4>📝 Descrizione Rapida (opzionale)</h4>
-          <input type="text" id="quick-description" placeholder="Aggiungi una breve descrizione per questo cluster..." maxlength="100">
+          <h4>📝 Quick Description (optional)</h4>
+          <input type="text" id="quick-description" placeholder="Add a brief description for this cluster..." maxlength="100">
         </div>
       </div>
       `}
@@ -2232,24 +2232,24 @@ app.get('/review', (req, res) => {
       </div>
 
       <div class="controls">
-        <button class="btn btn-primary" onclick="saveAndNext()">💾 Salva e Avanti</button>
-        <button class="btn btn-warning" onclick="skipCluster()">⏭️ Salta Cluster</button>
-        <button class="btn btn-danger" onclick="moveCluster()">🗑️ Sposta cluster in undefined</button>
+        <button class="btn btn-primary" onclick="saveAndNext()">💾 Save and Next</button>
+        <button class="btn btn-warning" onclick="skipCluster()">⏭️ Skip Cluster</button>
+        <button class="btn btn-danger" onclick="moveCluster()">🗑️ Move cluster to undefined</button>
       </div>
 
       <!-- Selection bar -->
       <div class="selection-bar" id="selection-bar">
         <div class="selection-info">
-          <span id="selection-count">0</span> elementi selezionati
+          <span id="selection-count">0</span> selected items
           <span style="margin-left: 15px; font-size: 13px; opacity: 0.8;">
-            💡 Trascina per selezionare • Shift+click per intervalli
+            💡 Drag to select • Shift+click for ranges
           </span>
         </div>
         <div class="selection-actions">
-          <button class="btn btn-primary" onclick="selectAll()">Seleziona Tutto</button>
-          <button class="btn btn-secondary" onclick="deselectAll()">Deseleziona</button>
+          <button class="btn btn-primary" onclick="selectAll()">Select All</button>
+          <button class="btn btn-secondary" onclick="deselectAll()">Deselect</button>
           <button class="btn btn-undefined" onclick="moveSelectedToUndefined()">Move to Undefined</button>
-          <button class="btn btn-success" onclick="showClusterSelectionModal()">Sposta in Cluster</button>
+          <button class="btn btn-success" onclick="showClusterSelectionModal()">Move to Cluster</button>
         </div>
       </div>
 
@@ -2257,18 +2257,18 @@ app.get('/review', (req, res) => {
       <div id="cluster-modal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
-            <h2>Seleziona cluster di destinazione</h2>
+            <h2>Select destination cluster</h2>
             <span class="modal-close" onclick="closeModal()">&times;</span>
           </div>
           <div id="cluster-grid" class="cluster-grid">
             <!-- Populated dynamically -->
           </div>
           <div class="new-cluster-input" id="new-cluster-input">
-            <h4>🆕 Crea nuovo cluster</h4>
-            <input type="text" id="new-cluster-name" placeholder="Nome del nuovo cluster (es: cluster_123 o descrizione)" maxlength="50">
+            <h4>🆕 Create new cluster</h4>
+            <input type="text" id="new-cluster-name" placeholder="New cluster name (e.g. cluster_123 or description)" maxlength="50">
             <div class="btn-group">
-              <button class="btn btn-success" onclick="createAndMoveToNewCluster()">✅ Crea e Sposta</button>
-              <button class="btn btn-secondary" onclick="cancelNewCluster()">❌ Annulla</button>
+              <button class="btn btn-success" onclick="createAndMoveToNewCluster()">✅ Create and Move</button>
+              <button class="btn btn-secondary" onclick="cancelNewCluster()">❌ Cancel</button>
             </div>
           </div>
         </div>
@@ -2528,11 +2528,11 @@ app.get('/review', (req, res) => {
 
         async function moveSelectedToUndefined() {
           if (selectedItems.size === 0) {
-            alert('Nessun elemento selezionato');
+            alert('No items selected');
             return;
           }
           
-          if (!confirm(\`Spostare \${selectedItems.size} elementi in undefined?\`)) return;
+          if (!confirm(\`Spostare \${selectedItems.size} items in undefined?\`)) return;
           
           try {
             const response = await fetch('/move-multiple-to-undefined', {
@@ -2547,7 +2547,7 @@ app.get('/review', (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`Spostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`Spostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -2559,7 +2559,7 @@ app.get('/review', (req, res) => {
 
         async function showClusterSelectionModal() {
           if (selectedItems.size === 0) {
-            alert('Nessun elemento selezionato');
+            alert('No items selected');
             return;
           }
           
@@ -2578,7 +2578,7 @@ app.get('/review', (req, res) => {
               \`).join('') + \`
               <div class="cluster-option new-cluster" onclick="showNewClusterInput()">
                 <div style="height: 100px; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #28a745;">+</div>
-                <div class="cluster-option-name">🆕 Crea Nuovo Cluster</div>
+                <div class="cluster-option-name">🆕 Create New Cluster</div>
               </div>
             \`;
             
@@ -2602,11 +2602,11 @@ app.get('/review', (req, res) => {
           const newClusterName = document.getElementById('new-cluster-name').value.trim();
           
           if (!newClusterName) {
-            alert('Inserisci un nome per il nuovo cluster');
+            alert('Enter a name for the new cluster');
             return;
           }
           
-          if (!confirm(\`Creare il nuovo cluster "\${newClusterName}" e spostare \${selectedItems.size} elementi?\`)) return;
+          if (!confirm(\`Creare il nuovo cluster "\${newClusterName}" e spostare \${selectedItems.size} items?\`)) return;
           
           try {
             const response = await fetch('/move-to-new-cluster', {
@@ -2622,7 +2622,7 @@ app.get('/review', (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`✅ Nuovo cluster "\${result.targetCluster}" creato!\\nSpostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`✅ Nuovo cluster "\${result.targetCluster}" creato!\\nSpostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -2638,7 +2638,7 @@ app.get('/review', (req, res) => {
         }
 
         async function moveSelectedToCluster(targetCluster) {
-          if (!confirm(\`Spostare \${selectedItems.size} elementi in \${targetCluster}?\`)) return;
+          if (!confirm(\`Spostare \${selectedItems.size} items in \${targetCluster}?\`)) return;
           
           try {
             const response = await fetch('/move-to-cluster', {
@@ -2654,7 +2654,7 @@ app.get('/review', (req, res) => {
             const result = await response.json();
             
             if (result.success) {
-              alert(\`Spostati \${result.moved} elementi su \${result.total}\`);
+              alert(\`Spostati \${result.moved} items su \${result.total}\`);
               location.reload();
             } else {
               alert('Errore: ' + (result.error || 'Sconosciuto'));
@@ -2692,7 +2692,7 @@ app.get('/review', (req, res) => {
             });
 
             if (response.ok) {
-              showAlert('✅ Annotazioni salvate con successo!');
+              showAlert('✅ Annotations saved successfully!');
               
               await fetch('/describe', {
                 method: 'POST',
@@ -2755,7 +2755,7 @@ app.get('/review', (req, res) => {
         }
         
         async function moveCluster() {
-          if (!confirm('Spostare tutto il cluster in undefined?')) return;
+          if (!confirm('Move entire cluster to undefined?')) return;
           
           try {
             await fetch('/move-cluster', {
@@ -2770,7 +2770,7 @@ app.get('/review', (req, res) => {
         }
         
         async function moveToUndefined(folder, item) {
-          const itemType = ${CONFIG.GROUP_MODE} ? 'gruppo' : 'immagine';
+          const itemType = ${CONFIG.GROUP_MODE} ? 'group' : 'image';
           if (!confirm(\`Spostare \${itemType} \${item} in undefined?\`)) return;
           
           try {
@@ -2811,7 +2811,7 @@ app.get('/review', (req, res) => {
             });
 
             if (response.ok) {
-              showAlert('✅ Annotazioni salvate con successo!');
+              showAlert('✅ Annotations saved successfully!');
               setTimeout(() => window.location.href = '/review', 800);
             } else throw new Error('Server error');
           } catch (err) {
@@ -2820,7 +2820,7 @@ app.get('/review', (req, res) => {
         }
 
         async function moveWholeCluster() {
-          if (!confirm('Spostare tutto il cluster in undefined?')) return;
+          if (!confirm('Move entire cluster to undefined?')) return;
           
           try {
             const response = await fetch('/move-cluster', {
@@ -2830,10 +2830,10 @@ app.get('/review', (req, res) => {
             });
             
             if (response.ok) {
-              alert('Cluster spostato!');
+              alert('Cluster moved!');
               window.location.href = '/';
             } else {
-              throw new Error('Errore del server');
+              throw new Error('Server error');
             }
           } catch (err) {
             alert('❌ Errore: ' + err.message);
@@ -2862,38 +2862,38 @@ app.get('/api/cluster-previews-extended', (req, res) => {
     const previews = getClusterPreviewsExtended();
     res.json(previews);
   } catch (error) {
-    console.error('Errore in cluster-previews-extended:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in cluster-previews-extended:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Endpoint per spostare elementi in un nuovo cluster
+// Endpoint per spostare items in un nuovo cluster
 app.post('/move-to-new-cluster', (req, res) => {
   try {
     const { sourceFolder, newClusterName, items } = req.body;
     
     if (!sourceFolder || !newClusterName || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ 
-        error: 'Parametri non validi',
+        error: 'Invalid parameters',
         required: ['sourceFolder', 'newClusterName', 'items (array)']
       });
     }
     
-    console.log(`🆕 Creazione nuovo cluster: ${newClusterName}`);
-    console.log(`📂 Da: ${sourceFolder}, Elementi: ${items.length}`);
+    console.log(`🆕 Creating new cluster: ${newClusterName}`);
+    console.log(`📂 From: ${sourceFolder}, Items: ${items.length}`);
     
     const result = moveToClusterExtended(sourceFolder, newClusterName, items, true);
     
     if (result.success) {
-      console.log(`✅ Nuovo cluster creato e ${result.moved} elementi spostati`);
+      console.log(`✅ Nuovo cluster creato e ${result.moved} items spostati`);
       res.json(result);
     } else {
-      console.error(`❌ Errore creazione nuovo cluster: ${result.error}`);
+      console.error(`❌ Error creating new cluster: ${result.error}`);
       res.status(500).json(result);
     }
   } catch (error) {
-    console.error('Errore in /move-to-new-cluster:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in /move-to-new-cluster:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -2904,7 +2904,7 @@ app.post('/create-empty-cluster', (req, res) => {
     
     if (!clusterName) {
       return res.status(400).json({ 
-        error: 'Nome cluster richiesto',
+        error: 'Cluster name required',
         required: ['clusterName']
       });
     }
@@ -2914,7 +2914,7 @@ app.post('/create-empty-cluster', (req, res) => {
     if (result.success) {
       res.json({
         success: true,
-        message: `Cluster "${result.clusterName}" creato con successo`,
+        message: `Cluster "${result.clusterName}" created successfully`,
         clusterName: result.clusterName,
         path: result.path
       });
@@ -2922,8 +2922,8 @@ app.post('/create-empty-cluster', (req, res) => {
       res.status(400).json(result);
     }
   } catch (error) {
-    console.error('Errore in /create-empty-cluster:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in /create-empty-cluster:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -2936,11 +2936,11 @@ app.get('/api/cluster-info/:name', (req, res) => {
     if (stats) {
       res.json(stats);
     } else {
-      res.status(404).json({ error: 'Cluster non trovato' });
+      res.status(404).json({ error: 'Cluster not found' });
     }
   } catch (error) {
-    console.error('Errore in /api/cluster-info:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in /api/cluster-info:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -2953,8 +2953,8 @@ app.get('/api/next-cluster-number', (req, res) => {
       suggestedName: `cluster_${nextNumber}`
     });
   } catch (error) {
-    console.error('Errore in /api/next-cluster-number:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in /api/next-cluster-number:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -2975,7 +2975,7 @@ function getNextClusterNumber() {
     
     return maxNumber + 1;
   } catch (error) {
-    console.error('Errore nel calcolare prossimo numero cluster:', error);
+    console.error('Error calculating next cluster number:', error);
     return 1;
   }
 }
@@ -2989,15 +2989,15 @@ function createNewCluster(clusterName) {
     const clusterPath = path.join(PATHS.base, finalName);
     
     if (fs.existsSync(clusterPath)) {
-      return { success: false, error: `Cluster "${finalName}" esiste già` };
+      return { success: false, error: `Cluster "${finalName}" already exists` };
     }
     
     fse.ensureDirSync(clusterPath);
-    console.log(`✅ Nuovo cluster creato: ${finalName}`);
+    console.log(`✅ New cluster created: ${finalName}`);
     
     return { success: true, clusterName: finalName, path: clusterPath };
   } catch (error) {
-    console.error('Errore nella creazione nuovo cluster:', error);
+    console.error('Error creating new cluster:', error);
     return { success: false, error: error.message };
   }
 }
@@ -3018,9 +3018,9 @@ function moveToClusterExtended(sourceFolder, targetFolder, items, createIfNotExi
           return { success: false, error: creationResult.error };
         }
         newClusterCreated = true;
-        console.log(`🆕 Nuovo cluster creato durante spostamento: ${targetFolder}`);
+        console.log(`🆕 New cluster created during move: ${targetFolder}`);
       } else {
-        return { success: false, error: `Cluster destinazione "${targetFolder}" non trovato` };
+        return { success: false, error: `Destination cluster "${targetFolder}" not found` };
       }
     } else {
       fse.ensureDirSync(targetClusterPath);
@@ -3053,7 +3053,7 @@ function moveToClusterExtended(sourceFolder, targetFolder, items, createIfNotExi
       targetCluster: targetFolder
     };
   } catch (error) {
-    console.error('Errore in moveToClusterExtended:', error);
+    console.error('Error in moveToClusterExtended:', error);
     return { success: false, error: error.message };
   }
 }
@@ -3066,7 +3066,7 @@ function getClusterPreviewsExtended() {
   previews.push({
     name: '_CREATE_NEW_',
     preview: '/indefinite/new_cluster_icon.png', // Puoi aggiungere un'icona predefinita
-    displayName: '🆕 Crea Nuovo Cluster',
+    displayName: '🆕 Create New Cluster',
     isNew: true
   });
   
@@ -3102,7 +3102,7 @@ function getClusterPreviewsExtended() {
         isNew: false
       });
     } catch (error) {
-      console.error(`Error getting preview for ${cluster}:`, error);
+      console.error(`Error previewing ${cluster}:`, error);
     }
   }
   
@@ -3145,11 +3145,11 @@ function generateGroupContentWithSelection(folder) {
               <div class="sensor-popup">
                 <h4>Sensor Data</h4>
                 <p><strong>Timestamp:</strong> ${sensors.timestamp}</p>
-                <p><strong>Lamp:</strong> ${sensors['light.lamp'] || 'N/A'}</p>
-                <p><strong>Bed:</strong> ${sensors['light.bed'] || 'N/A'}</p>
-                <p><strong>Desk:</strong> ${sensors['light.desk'] || 'N/A'}</p>
+                <p><strong>Lampada:</strong> ${sensors['light.lampada'] || 'N/A'}</p>
+                <p><strong>Letto:</strong> ${sensors['light.letto'] || 'N/A'}</p>
+                <p><strong>Scrivania:</strong> ${sensors['light.scrivania'] || 'N/A'}</p>
                 <p><strong>Monitor:</strong> ${sensors['switch.monitor'] || 'N/A'}</p>
-                <p><strong>Brightness:</strong> ${sensors['sensor.room_brightness'] || 'N/A'}</p>
+                <p><strong>Luminosità:</strong> ${sensors['sensor.luminosita_camera'] || 'N/A'}</p>
               </div>
             `;
           } else {
@@ -3212,11 +3212,11 @@ function generateSingleContentWithSelection(folder) {
             <div class="sensor-popup">
               <h4>Sensor Data</h4>
               <p><strong>Timestamp:</strong> ${sensors.timestamp}</p>
-              <p><strong>Lamp:</strong> ${sensors['light.lamp'] || 'N/A'}</p>
-              <p><strong>Bed:</strong> ${sensors['light.bed'] || 'N/A'}</p>
-              <p><strong>Desk:</strong> ${sensors['light.desk'] || 'N/A'}</p>
+              <p><strong>Lampada:</strong> ${sensors['light.lampada'] || 'N/A'}</p>
+              <p><strong>Letto:</strong> ${sensors['light.letto'] || 'N/A'}</p>
+              <p><strong>Scrivania:</strong> ${sensors['light.scrivania'] || 'N/A'}</p>
               <p><strong>Monitor:</strong> ${sensors['switch.monitor'] || 'N/A'}</p>
-              <p><strong>Brightness:</strong> ${sensors['sensor.room_brightness'] || 'N/A'}</p>
+              <p><strong>Luminosità:</strong> ${sensors['sensor.luminosita_camera'] || 'N/A'}</p>
             </div>
           `;
         } else {
@@ -3273,7 +3273,7 @@ function saveQuickDescription(folder, description) {
             const f = line.substring(0, commaIndex);
             let d = line.substring(commaIndex + 1);
             
-            // Rimuovi le virgolette di inizio e fine se presenti
+            // Remove le virgolette di inizio e fine se presenti
             if (d.startsWith('"') && d.endsWith('"')) {
               d = d.slice(1, -1);
             }
@@ -3282,7 +3282,7 @@ function saveQuickDescription(folder, description) {
             
             return { folder: f, description: d };
           })
-          .filter(r => r && r.folder !== folder); // Rimuovi descrizione esistente per questo folder
+          .filter(r => r && r.folder !== folder); // Remove descrizione esistente per questo folder
       }
     }
     
@@ -3300,10 +3300,10 @@ function saveQuickDescription(folder, description) {
     }).join("\n");
     fs.writeFileSync(QUICK_DESCRIPTIONS_FILE, header + data, "utf8");
     
-    console.log(`📝 Descrizione rapida salvata per ${folder}: "${description}"`);
+    console.log(`📝 Quick description saved for ${folder}: "${description}"`);
     return true;
   } catch (error) {
-    console.error('Errore nel salvare descrizione rapida:', error);
+    console.error('Error saving quick description:', error);
     return false;
   }
 }
@@ -3325,7 +3325,7 @@ function getQuickDescription(folder) {
       let d = line.substring(commaIndex + 1);
       
       if (f === folder) {
-        // Rimuovi le virgolette di inizio e fine se presenti
+        // Remove le virgolette di inizio e fine se presenti
         if (d.startsWith('"') && d.endsWith('"')) {
           d = d.slice(1, -1);
         }
@@ -3336,7 +3336,7 @@ function getQuickDescription(folder) {
     }
     return null;
   } catch (error) {
-    console.error('Errore nel leggere descrizione rapida:', error);
+    console.error('Error reading quick description:', error);
     return null;
   }
 }
@@ -3350,7 +3350,7 @@ function loadSkippedClusters() {
     const data = fs.readFileSync(SKIPPED_CLUSTERS_FILE, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    console.error('Errore nel caricamento cluster saltati:', error);
+    console.error('Error loading skipped clusters:', error);
     return [];
   }
 }
@@ -3360,7 +3360,7 @@ function saveSkippedClusters(skippedList) {
     fs.writeFileSync(SKIPPED_CLUSTERS_FILE, JSON.stringify(skippedList, null, 2), 'utf8');
     return true;
   } catch (error) {
-    console.error('Errore nel salvare cluster saltati:', error);
+    console.error('Error saving skipped clusters:', error);
     return false;
   }
 }
@@ -3371,7 +3371,7 @@ function addSkippedCluster(folder) {
     if (!skipped.includes(folder)) {
       skipped.push(folder);
       saveSkippedClusters(skipped);
-      console.log(`⏭️ Cluster ${folder} aggiunto ai saltati`);
+      console.log(`⏭️ Cluster ${folder} added to skipped`);
       return true;
     }
     return false;
@@ -3388,12 +3388,12 @@ function removeSkippedCluster(folder) {
     if (index > -1) {
       skipped.splice(index, 1);
       saveSkippedClusters(skipped);
-      console.log(`✅ Cluster ${folder} rimosso dai saltati`);
+      console.log(`✅ Cluster ${folder} removed from skipped`);
       return true;
     }
     return false;
   } catch (error) {
-    console.error('Errore nel rimuovere cluster saltato:', error);
+    console.error('Error removing skipped cluster:', error);
     return false;
   }
 }
@@ -3407,7 +3407,7 @@ app.post('/save-quick-description', (req, res) => {
     const { folder, description } = req.body;
     
     if (!folder) {
-      return res.status(400).json({ error: 'Parametro folder mancante' });
+      return res.status(400).json({ error: 'Missing folder parameter' });
     }
     
     const result = saveQuickDescription(folder, description);
@@ -3415,15 +3415,15 @@ app.post('/save-quick-description', (req, res) => {
     if (result) {
       res.json({ 
         success: true, 
-        message: `Descrizione rapida salvata per ${folder}`,
+        message: `Quick description saved for ${folder}`,
         description: description || null
       });
     } else {
-      res.status(500).json({ error: 'Errore nel salvare la descrizione rapida' });
+      res.status(500).json({ error: 'Error saving quick description' });
     }
   } catch (error) {
-    console.error('Errore in save-quick-description:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in save-quick-description:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -3432,7 +3432,7 @@ app.post('/skip-cluster', (req, res) => {
     const { folder } = req.body;
     
     if (!folder) {
-      return res.status(400).json({ error: 'Parametro folder mancante' });
+      return res.status(400).json({ error: 'Missing folder parameter' });
     }
     
     const result = addSkippedCluster(folder);
@@ -3440,17 +3440,17 @@ app.post('/skip-cluster', (req, res) => {
     if (result) {
       res.json({ 
         success: true, 
-        message: `Cluster ${folder} saltato con successo`
+        message: `Cluster ${folder} skipped successfully`
       });
     } else {
       res.json({ 
         success: true, 
-        message: `Cluster ${folder} era già stato saltato`
+        message: `Cluster ${folder} was already skipped`
       });
     }
   } catch (error) {
-    console.error('Errore in skip-cluster:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in skip-cluster:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -3473,17 +3473,17 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
     // Verifica che il target esista
     const targetPath = path.join(PATHS.base, targetCluster);
     if (!fs.existsSync(targetPath)) {
-      return { success: false, error: `Cluster destinazione ${targetCluster} non trovato` };
+      return { success: false, error: `Destination cluster ${targetCluster} not found` };
     }
     
     // Filtra i cluster da unire (escludi il target)
     const sourceClusters = clusterNames.filter(name => name !== targetCluster);
     
     if (sourceClusters.length === 0) {
-      return { success: false, error: 'Nessun cluster da unire' };
+      return { success: false, error: 'No clusters to merge' };
     }
     
-    console.log(`🔀 Unendo ${sourceClusters.length} cluster in ${targetCluster}`);
+    console.log(`🔀 Merging ${sourceClusters.length} clusters into ${targetCluster}`);
     
     // Unisci ogni cluster sorgente nel target
     for (const sourceCluster of sourceClusters) {
@@ -3491,12 +3491,12 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
         const sourcePath = path.join(PATHS.base, sourceCluster);
         
         if (!fs.existsSync(sourcePath)) {
-          errors.push(`Cluster ${sourceCluster} non trovato`);
+          errors.push(`Cluster ${sourceCluster} not found`);
           continue;
         }
         
         if (CONFIG.GROUP_MODE) {
-          // In modalità gruppi
+          // In modalità groups
           const groups = fs.readdirSync(sourcePath, { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
@@ -3506,7 +3506,7 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
               const sourceGroupPath = path.join(sourcePath, group);
               const targetGroupPath = path.join(targetPath, group);
               
-              // Se il gruppo esiste già nel target, sposta i file singolarmente
+              // Se il group esiste già nel target, sposta i file singolarmente
               if (fs.existsSync(targetGroupPath)) {
                 const files = fs.readdirSync(sourceGroupPath).filter(isImageFile);
                 
@@ -3529,7 +3529,7 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
                     totalMoved++;
                     totalCount++;
                   } catch (error) {
-                    console.error(`Errore spostamento file ${file}:`, error);
+                    console.error(`Error moving file ${file}:`, error);
                     totalCount++;
                   }
                 }
@@ -3537,10 +3537,10 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
                 try {
                   fs.rmdirSync(sourceGroupPath);
                 } catch (e) {
-                  console.warn(`Impossibile rimuovere cartella gruppo ${group}:`, e.message);
+                  console.warn(`Impossibile rimuovere cartella group ${group}:`, e.message);
                 }
               } else {
-                // Sposta l'intera cartella gruppo
+                // Sposta l'intera cartella group
                 fse.moveSync(sourceGroupPath, targetGroupPath, { overwrite: false });
                 
                 const files = fs.readdirSync(targetGroupPath).filter(isImageFile);
@@ -3552,7 +3552,7 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
                 }
               }
             } catch (error) {
-              console.error(`Errore spostamento gruppo ${group}:`, error);
+              console.error(`Errore spostamento group ${group}:`, error);
             }
           }
         } else {
@@ -3578,23 +3578,23 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
               totalMoved++;
               totalCount++;
             } catch (error) {
-              console.error(`Errore spostamento file ${file}:`, error);
+              console.error(`Error moving file ${file}:`, error);
               totalCount++;
             }
           }
         }
         
-        // Rimuovi il cluster sorgente vuoto
+        // Remove il cluster sorgente vuoto
         try {
           fs.rmdirSync(sourcePath);
-          console.log(`✅ Cluster ${sourceCluster} rimosso dopo merge`);
+          console.log(`✅ Cluster ${sourceCluster} removed after merge`);
         } catch (error) {
-          console.warn(`⚠️ Impossibile rimuovere cartella cluster ${sourceCluster}:`, error.message);
+          console.warn(`⚠️ Cannot remove cluster folder ${sourceCluster}:`, error.message);
         }
         
       } catch (error) {
-        errors.push(`Errore con cluster ${sourceCluster}: ${error.message}`);
-        console.error(`Errore nel processare cluster ${sourceCluster}:`, error);
+        errors.push(`Error with cluster ${sourceCluster}: ${error.message}`);
+        console.error(`Error processing cluster ${sourceCluster}:`, error);
       }
     }
     
@@ -3610,11 +3610,11 @@ function mergeMultipleClusters(clusterNames, targetCluster = null) {
       targetCluster,
       mergedClusters: sourceClusters,
       errors: errors.length > 0 ? errors : null,
-      message: `Uniti ${totalMoved} elementi da ${sourceClusters.length} cluster in ${targetCluster}`
+      message: `Merged ${totalMoved} items from ${sourceClusters.length} clusters into ${targetCluster}`
     };
     
   } catch (error) {
-    console.error('Errore in mergeMultipleClusters:', error);
+    console.error('Error in mergeMultipleClusters:', error);
     return { success: false, error: error.message };
   }
 }
@@ -3630,20 +3630,20 @@ function mergeClusterInto(sourceCluster, targetCluster) {
     
     // Verifica che entrambi i cluster esistano
     if (!fs.existsSync(sourcePath)) {
-      return { success: false, error: `Cluster sorgente ${sourceCluster} non trovato` };
+      return { success: false, error: `Source cluster ${sourceCluster} not found` };
     }
     
     if (!fs.existsSync(targetPath)) {
-      return { success: false, error: `Cluster destinazione ${targetCluster} non trovato` };
+      return { success: false, error: `Destination cluster ${targetCluster} not found` };
     }
     
     // Assicurati che non siano lo stesso cluster
     if (sourceCluster === targetCluster) {
-      return { success: false, error: 'Cluster sorgente e destinazione devono essere diversi' };
+      return { success: false, error: 'Source and destination clusters must be different' };
     }
     
     if (CONFIG.GROUP_MODE) {
-      // In modalità gruppi, sposta tutte le sottocartelle (gruppi)
+      // In modalità groups, sposta tutte le sottocartelle (groups)
       const groups = fs.readdirSync(sourcePath, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
@@ -3653,7 +3653,7 @@ function mergeClusterInto(sourceCluster, targetCluster) {
           const sourceGroupPath = path.join(sourcePath, group);
           const targetGroupPath = path.join(targetPath, group);
           
-          // Se il gruppo esiste già nel target, sposta i file singolarmente
+          // Se il group esiste già nel target, sposta i file singolarmente
           if (fs.existsSync(targetGroupPath)) {
             const files = fs.readdirSync(sourceGroupPath).filter(isImageFile);
             
@@ -3677,19 +3677,19 @@ function mergeClusterInto(sourceCluster, targetCluster) {
                 successCount++;
                 totalCount++;
               } catch (error) {
-                console.error(`Errore spostamento file ${file}:`, error);
+                console.error(`Error moving file ${file}:`, error);
                 totalCount++;
               }
             }
             
-            // Rimuovi la cartella gruppo vuota
+            // Remove la cartella group vuota
             try {
               fs.rmdirSync(sourceGroupPath);
             } catch (e) {
-              console.warn(`Impossibile rimuovere cartella gruppo ${group}:`, e.message);
+              console.warn(`Impossibile rimuovere cartella group ${group}:`, e.message);
             }
           } else {
-            // Se il gruppo non esiste, sposta l'intera cartella
+            // Se il group non esiste, sposta l'intera cartella
             fse.moveSync(sourceGroupPath, targetGroupPath, { overwrite: false });
             
             // Registra tutti i file spostati
@@ -3702,7 +3702,7 @@ function mergeClusterInto(sourceCluster, targetCluster) {
             }
           }
         } catch (error) {
-          console.error(`Errore spostamento gruppo ${group}:`, error);
+          console.error(`Errore spostamento group ${group}:`, error);
         }
       }
     } else {
@@ -3729,7 +3729,7 @@ function mergeClusterInto(sourceCluster, targetCluster) {
           successCount++;
           totalCount++;
         } catch (error) {
-          console.error(`Errore spostamento file ${file}:`, error);
+          console.error(`Error moving file ${file}:`, error);
           totalCount++;
         }
       }
@@ -3738,9 +3738,9 @@ function mergeClusterInto(sourceCluster, targetCluster) {
     // Se tutto è andato bene, rimuovi la cartella cluster vuota
     try {
       fs.rmdirSync(sourcePath);
-      console.log(`✅ Cluster ${sourceCluster} rimosso dopo merge`);
+      console.log(`✅ Cluster ${sourceCluster} removed after merge`);
     } catch (error) {
-      console.warn(`⚠️ Impossibile rimuovere cartella cluster ${sourceCluster}:`, error.message);
+      console.warn(`⚠️ Cannot remove cluster folder ${sourceCluster}:`, error.message);
     }
     
     // Salva i movimenti nel log
@@ -3754,11 +3754,11 @@ function mergeClusterInto(sourceCluster, targetCluster) {
       total: totalCount,
       sourceCluster,
       targetCluster,
-      message: `Uniti ${successCount} elementi da ${sourceCluster} a ${targetCluster}`
+      message: `Merged ${successCount} items from ${sourceCluster} to ${targetCluster}`
     };
     
   } catch (error) {
-    console.error('Errore in mergeClusterInto:', error);
+    console.error('Error in mergeClusterInto:', error);
     return { success: false, error: error.message };
   }
 }
@@ -3807,7 +3807,7 @@ function getClusterStats(clusterName) {
       mode: CONFIG.GROUP_MODE ? 'groups' : 'single'
     };
   } catch (error) {
-    console.error(`Errore in getClusterStats per ${clusterName}:`, error);
+    console.error(`Error in getClusterStats for ${clusterName}:`, error);
     return null;
   }
 }
@@ -3829,7 +3829,7 @@ app.get('/merge', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>🔀 Unisci Cluster - Cluster Manager</title>
+      <title>🔀 Merge Clusters - Cluster Manager</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }
@@ -3956,23 +3956,23 @@ app.get('/merge', (req, res) => {
     <body>
       <div class="container">
         <div class="header">
-          <a href="/" class="back-link">← Torna alla Home</a>
-          <h1>🔀 Unisci Cluster</h1>
+          <a href="/" class="back-link">← Back to Home</a>
+          <h1>🔀 Merge Clusters</h1>
         </div>
         
         ${clusters.length < 2 ? `
           <div class="no-clusters">
-            <h2>⚠️ Cluster insufficienti</h2>
-            <p>Sono necessari almeno 2 cluster per poter eseguire un'unione.</p>
-            <p>Cluster disponibili: ${clusters.length}</p>
+            <h2>⚠️ Insufficient clusters</h2>
+            <p>At least 2 clusters are needed to perform a merge.</p>
+            <p>Available clusters: ${clusters.length}</p>
           </div>
         ` : `
           <div class="instructions">
-            <h3>📋 Come funziona</h3>
-            <p>1. Seleziona i cluster che vuoi unire cliccandoci sopra</p>
-            <p>2. Il primo cluster selezionato (contrassegnato con "1") sarà la destinazione</p>
-            <p>3. Tutti gli altri cluster selezionati verranno uniti nel primo e poi eliminati</p>
-            <p>4. I file con nomi duplicati verranno rinominati automaticamente</p>
+            <h3>📋 How it works</h3>
+            <p>1. Select the clusters you want to merge by clicking on them</p>
+            <p>2. The first selected cluster (marked with "1") will be the destination</p>
+            <p>3. All other selected clusters will be merged into the first one and then deleted</p>
+            <p>4. Files with duplicate names will be automatically renamed</p>
           </div>
           
           <div class="cluster-grid">
@@ -3983,8 +3983,8 @@ app.get('/merge', (req, res) => {
                 ${stats.previewImage ? `<img src="${stats.previewImage}" alt="${stats.name}" class="cluster-preview">` : '<div class="cluster-preview"></div>'}
                 <div class="cluster-name">${stats.name}</div>
                 <div class="cluster-stats">
-                  ${stats.itemCount} ${stats.itemCount === 1 ? 'elemento' : 'elementi'}
-                  ${CONFIG.GROUP_MODE ? `<br>${stats.groupCount} ${stats.groupCount === 1 ? 'gruppo' : 'gruppi'}` : ''}
+                  ${stats.itemCount} ${stats.itemCount === 1 ? 'item' : 'items'}
+                  ${CONFIG.GROUP_MODE ? `<br>${stats.groupCount} ${stats.groupCount === 1 ? 'group' : 'groups'}` : ''}
                 </div>
               </div>
             `).join('')}
@@ -3994,23 +3994,23 @@ app.get('/merge', (req, res) => {
             <div id="alert-container"></div>
             
             <div class="selection-info" id="selection-info">
-              <h3>📋 Riepilogo Operazione</h3>
+              <h3>📋 Operation Summary</h3>
               <div id="selection-details"></div>
             </div>
             
             <div class="loader" id="loader">
               <div class="spinner"></div>
-              <p style="margin-top: 10px;">Unione in corso...</p>
+              <p style="margin-top: 10px;">Merging...</p>
             </div>
             
             <button class="btn btn-secondary" onclick="selectAll()">
-              ☑️ Seleziona Tutto
+              ☑️ Select All
             </button>
             <button class="btn btn-secondary" onclick="deselectAll()">
-              ⬜ Deseleziona Tutto
+              ⬜ Deselect Tutto
             </button>
             <button class="btn btn-primary" id="merge-btn" onclick="performMerge()" disabled>
-              🔀 Unisci Cluster Selezionati
+              🔀 Merge Clusters Selezionati
             </button>
           </div>
         `}
@@ -4089,18 +4089,18 @@ app.get('/merge', (req, res) => {
             const targetStats = clusterStats.find(c => c.name === targetCluster);
             
             details.innerHTML = \`
-              <p><strong>Cluster destinazione:</strong></p>
+              <p><strong>Destination cluster:</strong></p>
               <div class="selection-list">
-                <span class="selection-list-item target">📥 \${targetCluster} (\${targetStats.itemCount} elementi)</span>
+                <span class="selection-list-item target">📥 \${targetCluster} (\${targetStats.itemCount} items)</span>
               </div>
-              <p><strong>Cluster da unire:</strong></p>
+              <p><strong>Clusters to merge:</strong></p>
               <div class="selection-list">
                 \${sourceClusters.map(name => {
                   const stats = clusterStats.find(c => c.name === name);
-                  return '<span class="selection-list-item">📤 ' + name + ' (' + stats.itemCount + ' elementi)</span>';
+                  return '<span class="selection-list-item">📤 ' + name + ' (' + stats.itemCount + ' items)</span>';
                 }).join('')}
               </div>
-              <p style="margin-top: 15px;"><strong>Totale elementi da spostare:</strong> \${totalItems}</p>
+              <p style="margin-top: 15px;"><strong>Totale items da spostare:</strong> \${totalItems}</p>
               <p><strong>Elementi finali in \${targetCluster}:</strong> \${targetStats.itemCount + totalItems}</p>
             \`;
           } else {
@@ -4111,7 +4111,7 @@ app.get('/merge', (req, res) => {
         
         async function performMerge() {
           if (selectedClusters.length < 2) {
-            showAlert('⚠️ Seleziona almeno 2 cluster da unire!', 'warning');
+            showAlert('⚠️ Select at least 2 clusters to merge!', 'warning');
             return;
           }
           
@@ -4119,8 +4119,8 @@ app.get('/merge', (req, res) => {
           const sourceClusters = selectedClusters.slice(1);
           
           const confirmMsg = 'Vuoi unire ' + sourceClusters.length + ' cluster in "' + targetCluster + '"?\\n\\n' +
-                           'Cluster da unire: ' + sourceClusters.join(', ') + '\\n\\n' +
-                           '⚠️ I cluster uniti verranno eliminati!';
+                           'Clusters to merge: ' + sourceClusters.join(', ') + '\\n\\n' +
+                           '⚠️ Merged clusters will be deleted!';
           
           if (!confirm(confirmMsg)) return;
           
@@ -4145,17 +4145,17 @@ app.get('/merge', (req, res) => {
             if (result.success) {
               showAlert('✅ ' + result.message, 'success');
               if (result.errors && result.errors.length > 0) {
-                showAlert('⚠️ Alcuni errori: ' + result.errors.join(', '), 'warning');
+                showAlert('⚠️ Some errors: ' + result.errors.join(', '), 'warning');
               }
               setTimeout(() => {
                 window.location.href = '/cluster/' + result.targetCluster;
               }, 2000);
             } else {
-              showAlert('❌ Errore: ' + result.error, 'error');
+              showAlert('❌ Error: ' + result.error, 'error');
               btn.disabled = false;
             }
           } catch (error) {
-            showAlert('❌ Errore: ' + error.message, 'error');
+            showAlert('❌ Error: ' + error.message, 'error');
             btn.disabled = false;
           } finally {
             loader.classList.remove('show');
@@ -4180,26 +4180,26 @@ app.post('/merge-multiple-clusters', (req, res) => {
     if (!clusterNames || !Array.isArray(clusterNames) || clusterNames.length < 2) {
       return res.status(400).json({ 
         error: 'Servono almeno 2 cluster per l\'unione',
-        required: ['clusterNames (array con almeno 2 elementi)']
+        required: ['clusterNames (array con almeno 2 items)']
       });
     }
     
-    console.log(`🔄 Richiesta merge multiplo: ${clusterNames.join(', ')}`);
+    console.log(`🔄 Multiple merge request: ${clusterNames.join(', ')}`);
     console.log(`📥 Target cluster: ${targetCluster || clusterNames[0]}`);
     
     const result = mergeMultipleClusters(clusterNames, targetCluster);
     
     if (result.success) {
-      console.log(`✅ Merge completato: ${result.moved}/${result.total} elementi spostati`);
+      console.log(`✅ Merge completato: ${result.moved}/${result.total} items spostati`);
       res.json(result);
     } else {
-      console.error(`❌ Errore merge: ${result.error}`);
+      console.error(`❌ Merge error: ${result.error}`);
       res.status(500).json(result);
     }
   } catch (error) {
-    console.error('Errore in /merge-multiple-clusters:', error);
+    console.error('Error in /merge-multiple-clusters:', error);
     res.status(500).json({ 
-      error: 'Errore interno del server',
+      error: 'Internal server error',
       details: error.message 
     });
   }
@@ -4211,26 +4211,26 @@ app.post('/merge-clusters', (req, res) => {
     
     if (!sourceCluster || !targetCluster) {
       return res.status(400).json({ 
-        error: 'Parametri mancanti',
+        error: 'Missing parameters',
         required: ['sourceCluster', 'targetCluster']
       });
     }
     
-    console.log(`🔄 Richiesta merge: ${sourceCluster} -> ${targetCluster}`);
+    console.log(`🔄 Merge request: ${sourceCluster} -> ${targetCluster}`);
     
     const result = mergeClusterInto(sourceCluster, targetCluster);
     
     if (result.success) {
-      console.log(`✅ Merge completato: ${result.moved}/${result.total} elementi spostati`);
+      console.log(`✅ Merge completato: ${result.moved}/${result.total} items spostati`);
       res.json(result);
     } else {
-      console.error(`❌ Errore merge: ${result.error}`);
+      console.error(`❌ Merge error: ${result.error}`);
       res.status(500).json(result);
     }
   } catch (error) {
-    console.error('Errore in /merge-clusters:', error);
+    console.error('Error in /merge-clusters:', error);
     res.status(500).json({ 
-      error: 'Errore interno del server',
+      error: 'Internal server error',
       details: error.message 
     });
   }
@@ -4244,14 +4244,14 @@ app.post("/describe", (req, res) => {
   try {
     const { folder, description } = req.body;
     if (!folder || !description) {
-      return res.status(400).json({ error: 'Parametri mancanti' });
+      return res.status(400).json({ error: 'Missing parameters' });
     }
     
     saveCsv(folder, description);
     res.json({ success: true });
   } catch (error) {
-    console.error('Errore nel salvare descrizione:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error saving description:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -4260,19 +4260,19 @@ app.post('/move-to-undefined', (req, res) => {
     const { folder, item } = req.body;
     
     if (!folder || !item) {
-      return res.status(400).json({ error: 'Parametri mancanti' });
+      return res.status(400).json({ error: 'Missing parameters' });
     }
     
     const result = moveToUndefined(folder, item);
     
     if (result) {
-      res.json({ success: true, message: `${item} spostato in undefined` });
+      res.json({ success: true, message: `${item} moved to undefined` });
     } else {
-      res.status(500).json({ error: 'Errore nello spostamento' });
+      res.status(500).json({ error: 'Error moving' });
     }
   } catch (error) {
-    console.error('Errore nello spostamento:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error moving:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -4281,32 +4281,32 @@ app.post('/move-cluster', (req, res) => {
     const { folder } = req.body;
     
     if (!folder) {
-      return res.status(400).json({ error: 'Parametro folder mancante' });
+      return res.status(400).json({ error: 'Missing folder parameter' });
     }
     
     const result = moveClusterToUndefined(folder);
     
     if (result) {
-      res.json({ success: true, message: `Cluster ${folder} spostato in undefined` });
+      res.json({ success: true, message: `Cluster ${folder} moved to undefined` });
     } else {
-      res.status(500).json({ error: 'Errore nello spostamento del cluster' });
+      res.status(500).json({ error: 'Error moving del cluster' });
     }
   } catch (error) {
-    console.error('Errore nello spostamento cluster:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error moving cluster:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 app.post('/annotate', (req, res) => {
   if (!CONFIG.ANNOTATIONS_ENABLED) {
-    return res.status(400).json({ error: 'Annotazioni disabilitate' });
+    return res.status(400).json({ error: 'Annotations disabled' });
   }
   
   try {
     const { folder, actions, simple_description, output_vocale } = req.body;
     if (!folder || !actions) {
       return res.status(400).json({
-        error: 'Parametri mancanti',
+        error: 'Missing parameters',
         required: ['folder', 'actions']
       });
     }
@@ -4316,7 +4316,7 @@ app.post('/annotate', (req, res) => {
 
     const clusterPath = path.join(PATHS.base, folder);
     if (!fs.existsSync(clusterPath)) {
-      return res.status(404).json({ error: 'Cluster non trovato' });
+      return res.status(404).json({ error: 'Cluster not found' });
     }
 
     if (CONFIG.GROUP_MODE) {
@@ -4343,7 +4343,7 @@ app.post('/annotate', (req, res) => {
                 timestamp = csvTs;
               }
             } catch (e) {
-              console.error(`Errore sensori per ${img}:`, e);
+              console.error(`Sensor error for ${img}:`, e);
             }
           }
           
@@ -4379,7 +4379,7 @@ app.post('/annotate', (req, res) => {
               timestamp = csvTs;
             }
           } catch (e) {
-            console.error(`Errore sensori per ${img}:`, e);
+            console.error(`Sensor error for ${img}:`, e);
           }
         }
         
@@ -4401,14 +4401,14 @@ app.post('/annotate', (req, res) => {
 
     res.json({
       success: true,
-      message: `Annotazioni salvate per cluster "${folder}"`,
+      message: `Annotations saved for cluster "${folder}"`,
       total_annotations: annotations.length
     });
 
   } catch (err) {
-    console.error('Errore salvataggio annotazioni:', err);
+    console.error('Error saving annotations:', err);
     res.status(500).json({
-      error: 'Errore interno del server',
+      error: 'Internal server error',
       details: err.message
     });
   }
@@ -4425,7 +4425,7 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gestione Annotazioni</title>
+        <title>Annotations Management</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; padding: 20px; }
@@ -4446,16 +4446,16 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
       </head>
       <body>
         <div class="header">
-          <a href="/" class="back-link">← Torna alla home</a>
-          <h1>📋 Gestione Annotazioni</h1>
+          <a href="/" class="back-link">← Back to home</a>
+          <h1>📋 Annotations Management</h1>
         </div>
         
         <div class="stats">
-          <h3>📊 Statistiche</h3>
-          <p><strong>Totale annotazioni:</strong> ${annotations.length}</p>
-          <p><strong>Cluster annotati:</strong> ${new Set(annotations.map(a => a.cluster)).size}</p>
-          <button class="btn btn-primary" onclick="downloadAnnotations()">💾 Scarica JSON</button>
-          <button class="btn btn-danger" onclick="clearAllAnnotations()">🗑️ Cancella Tutto</button>
+          <h3>📊 Statistics</h3>
+          <p><strong>Total annotations:</strong> ${annotations.length}</p>
+          <p><strong>Annotated clusters:</strong> ${new Set(annotations.map(a => a.cluster)).size}</p>
+          <button class="btn btn-primary" onclick="downloadAnnotations()">💾 Download JSON</button>
+          <button class="btn btn-danger" onclick="clearAllAnnotations()">🗑️ Delete All</button>
         </div>
         
         <div id="annotations-list">
@@ -4463,13 +4463,13 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
             <div class="annotation-item">
               <div class="annotation-header">
                 <h4>Cluster: ${ann.cluster}${ann.group ? ` - Gruppo: ${ann.group}` : ''}</h4>
-                <button class="btn btn-danger" onclick="deleteAnnotation(${index})">🗑️ Elimina</button>
+                <button class="btn btn-danger" onclick="deleteAnnotation(${index})">🗑️ Delete</button>
               </div>
-              <p><strong>Immagini:</strong> ${ann.inputs?.length || 0}</p>
-              <p><strong>Azioni:</strong> ${ann.outputs?.actions?.length || 0}</p>
-              <p><strong>Descrizione:</strong> ${ann.outputs?.simple_description || 'N/A'}</p>
+              <p><strong>Images:</strong> ${ann.inputs?.length || 0}</p>
+              <p><strong>Actions:</strong> ${ann.outputs?.actions?.length || 0}</p>
+              <p><strong>Description:</strong> ${ann.outputs?.simple_description || 'N/A'}</p>
               <details>
-                <summary>Dettagli completi</summary>
+                <summary>Full details</summary>
                 <pre>${JSON.stringify(ann, null, 2)}</pre>
               </details>
             </div>
@@ -4478,7 +4478,7 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
         
         <script>
           async function deleteAnnotation(index) {
-            if (!confirm('Eliminare questa annotazione?')) return;
+            if (!confirm('Delete this annotation?')) return;
             
             try {
               const response = await fetch('/delete-annotation', {
@@ -4498,7 +4498,7 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
           }
           
           async function clearAllAnnotations() {
-            if (!confirm('Eliminare TUTTE le annotazioni? Questa azione non può essere annullata!')) return;
+            if (!confirm('Delete ALL annotations? This action cannot be undone!')) return;
             
             try {
               const response = await fetch('/clear-annotations', {
@@ -4509,7 +4509,7 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
               if (response.ok) {
                 location.reload();
               } else {
-                alert('Errore nella cancellazione');
+                alert('Error clearing');
               }
             } catch (err) {
               alert('Errore: ' + err.message);
@@ -4544,11 +4544,11 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
         saveAnnotations(annotations);
         res.json({ success: true });
       } else {
-        res.status(400).json({ error: 'Indice non valido' });
+        res.status(400).json({ error: 'Invalid index' });
       }
     } catch (error) {
       console.error('Errore nell\'eliminazione annotazione:', error);
-      res.status(500).json({ error: 'Errore interno del server' });
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
 
@@ -4557,8 +4557,8 @@ if (CONFIG.ANNOTATIONS_ENABLED) {
       saveAnnotations([]);
       res.json({ success: true });
     } catch (error) {
-      console.error('Errore nella cancellazione annotazioni:', error);
-      res.status(500).json({ error: 'Errore interno del server' });
+      console.error('Error clearing annotazioni:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
 }
@@ -4572,7 +4572,7 @@ app.post('/move-multiple-to-undefined', (req, res) => {
     const { folder, items } = req.body;
     
     if (!folder || !items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'Parametri non validi' });
+      return res.status(400).json({ error: 'Invalid parameters' });
     }
     
     const result = moveMultipleToUndefined(folder, items);
@@ -4583,8 +4583,8 @@ app.post('/move-multiple-to-undefined', (req, res) => {
       res.status(500).json(result);
     }
   } catch (error) {
-    console.error('Errore in move-multiple-to-undefined:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in move-multiple-to-undefined:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -4593,7 +4593,7 @@ app.post('/move-to-cluster', (req, res) => {
     const { sourceFolder, targetFolder, items } = req.body;
     
     if (!sourceFolder || !targetFolder || !items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'Parametri non validi' });
+      return res.status(400).json({ error: 'Invalid parameters' });
     }
     
     const result = moveToCluster(sourceFolder, targetFolder, items);
@@ -4604,8 +4604,8 @@ app.post('/move-to-cluster', (req, res) => {
       res.status(500).json(result);
     }
   } catch (error) {
-    console.error('Errore in move-to-cluster:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in move-to-cluster:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -4614,8 +4614,8 @@ app.get('/api/cluster-previews', (req, res) => {
     const previews = getClusterPreviews();
     res.json(previews);
   } catch (error) {
-    console.error('Errore in cluster-previews:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Error in cluster-previews:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -4627,19 +4627,19 @@ app.use((req, res) => {
   res.status(404).send(`
     <html>
       <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-        <h1>❌ Pagina non trovata</h1>
-        <p>La risorsa richiesta non è disponibile.</p>
-        <a href="/" style="color: #007bff;">← Torna alla home</a>
+        <h1>❌ Page not found</h1>
+        <p>The requested resource is not available.</p>
+        <a href="/" style="color: #007bff;">← Back to home</a>
       </body>
     </html>
   `);
 });
 
 app.use((error, req, res, next) => {
-  console.error('Errore server:', error);
+  console.error('Server error:', error);
   res.status(500).json({
-    error: 'Errore interno del server',
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Qualcosa è andato storto'
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
   });
 });
 
@@ -4659,29 +4659,29 @@ loadCSVData()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`
-🚀 Cluster Manager avviato con successo!
+🚀 Cluster Manager started successfully!
 📍 URL: http://localhost:${PORT}
 
-⚙️  CONFIGURAZIONE ATTUALE:
-📁 Cartella base: ${CONFIG.BASE_FOLDER} ${fs.existsSync(PATHS.base) ? '✅' : '❌'}
-📊 File CSV: ${CONFIG.CSV_FILE || 'Disabilitato'} ${CONFIG.CSV_FILE && fs.existsSync(PATHS.csv) ? '✅' : '❌'}
-🔄 Modalità: ${CONFIG.GROUP_MODE ? 'Gruppi (ogni cluster diviso in gruppi)' : 'Singola (immagini singole)'}
-📝 Annotazioni: ${CONFIG.ANNOTATIONS_ENABLED ? 'Abilitate' : 'Disabilitate'}
+⚙️  CURRENT CONFIGURATION:
+📁 Base folder: ${CONFIG.BASE_FOLDER} ${fs.existsSync(PATHS.base) ? '✅' : '❌'}
+📊 File CSV: ${CONFIG.CSV_FILE || 'Disabled'} ${CONFIG.CSV_FILE && fs.existsSync(PATHS.csv) ? '✅' : '❌'}
+🔄 Mode: ${CONFIG.GROUP_MODE ? 'Groups (ogni cluster diviso in groups)' : 'Single (immagini singole)'}
+📝 Annotations: ${CONFIG.ANNOTATIONS_ENABLED ? 'Enabled' : 'Disabled'}
 
-📂 Directory:
+📂 Directories:
    - Cluster: ${PATHS.base}
    - Undefined: ${PATHS.undefined}
    - Indefinite: ${PATHS.indefinite}
-   - Descrizioni: ${PATHS.descriptions}
-   ${CONFIG.ANNOTATIONS_ENABLED ? `- Annotazioni: ${PATHS.annotations}` : ''}
+   - Descriptions: ${PATHS.descriptions}
+   ${CONFIG.ANNOTATIONS_ENABLED ? `- Annotations: ${PATHS.annotations}` : ''}
 
-📊 Dati sensori: ${csvData.length ? `${csvData.length} righe caricate` : 'Nessun dato'}
+📊 Sensor data: ${csvData.length ? `${csvData.length} rows loaded` : 'No data'}
 
-🎛️  Per modificare la configurazione, vai su: http://localhost:${PORT}/settings
+🎛️  To modify configuration, go to: http://localhost:${PORT}/settings
       `);
     });
   })
   .catch(error => {
-    console.error('Errore nel caricamento:', error);
+    console.error('Loading error:', error);
     process.exit(1);
   });
