@@ -74,7 +74,6 @@
   
   <!-- Line to prediction -->
   <line x1="890" y1="170" x2="920" y2="170" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-=======
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" font-family="Arial, sans-serif">
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
