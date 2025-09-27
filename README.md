@@ -133,37 +133,7 @@ I pesi non sono inclusi: è necessario produrli prima di avviare il sistema.
    - Genera sequenze temporali di immagini (`num_input_images` per predizione) accompagnate da vettori sensoriali e storico azioni.
    - Annota, per ogni sequenza, l'azione target e i parametri (es. stanza, dispositivo). Le label devono essere coerenti con i vocaboli che verranno salvati nel bundle.
 
-2. **Person detection (YOLO)**
-   - Allena o perfeziona un modello YOLO con classi della persona.
-   - Esporta i pesi (`.pt`) e posizionali in `config files/yolov8l.pt` (o aggiorna `yolo_version` nel config per puntare al file corretto).
-
-3. **Activity classifier**
-   - Utilizza `ActivityClassifier` in `model.py` come riferimento: è basato su EfficientNet-B0 pre-addestrata.
-   - Finetuna il layer finale con la tua tassonomia di attività e salva lo `state_dict` del classificatore.
-
-4. **Rete DomoticaAI**
-   - Prepara tensori di training seguendo `_make_inputs` in `model.py` (immagini, sensori, `prev_action_seq`).
-   - Esegui il training del modello `DomoticaAI` ottimizzando sia la classificazione dell'azione sia la selezione dei parametri.
-   - Durante il salvataggio, crea un pacchetto unico contenente:
-     ```python
-     torch.save({
-         "cfg": { ... },                # dimensioni, vocaboli, hyperparametri
-         "core_state": model.state_dict(),
-         "activity_state": activity_classifier.classifier.state_dict(),
-         "yolo_bytes": Path("yolo.pt").read_bytes(),
-         "vocab": {
-             "action_vocab": {...},
-             "param_vocab": {...},
-             "prev_vocab": {...}
-         }
-     }, "config files/model_definitive.pth")
-     ```
-   - Assicurati che `cfg` includa almeno `num_sensor`, `num_prev_actions`, `num_output_actions`, `num_output_params`, `num_input_images`, `embedding_dim`, `prev_action_emb_dim`, `action_emb_dim`, `max_persons`, `device`.
-
-5. **Verifica**
-   - Testa il bundle caricandolo con `load_model(bundle_path="config files/model_definitive.pth")` prima di avviare il server.
-   - Aggiorna `MODEL_BUNDLE_PATH` nel config o nelle variabili d'ambiente.
-
+2. **Segui le istruzioni inserite nel readme della cartella "model training" di questo repo**
 ## Suggerimenti per lo sviluppo
 - Per un controllo rapido della sintassi esegui `python -m py_compile main.py`.
 - Se modifichi il modello, amplia le variabili d'ambiente oppure rigenera il bundle.
@@ -171,7 +141,6 @@ I pesi non sono inclusi: è necessario produrli prima di avviare il sistema.
 
 ## Troubleshooting
 - **`Impossibile caricare il modello per l'automazione passiva`**: verifica percorso `MODEL_BUNDLE_PATH` e la presenza delle chiavi nel bundle.
-- **`Repository dei modelli BLIP non configurati`**: imposta i repo HuggingFace (o i checkpoint locali) in `config.json` / variabili d'ambiente.
 - **Azioni non eseguite**: controlla che `casa.json` contenga nome stanza/dispositivo coerente con quanto atteso dai parametri del modello.
 
 ---
