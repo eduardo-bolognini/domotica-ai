@@ -31,7 +31,7 @@ Il repository non include i pesi dei modelli; è necessario addestrarli e confez
 - Librerie di sistema per audio/video (es. `portaudio`, `ffmpeg`, librerie X/GL) se si esegue su Linux.
 
 ## Installazione rapida
-1. Clona il repository e spostati nella cartella `beta 4 github`.
+1. Clona il repository e spostati nella cartella `src`.
 2. (Opzionale ma consigliato) crea un ambiente virtuale:
    ```bash
    python3 -m venv .venv
